@@ -1,0 +1,245 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Preferences
+  preferredSystem String @default("metric") // metric or imperial
+  language        String @default("he")
+
+  // Relations
+  recipes Recipe[]
+
+  @@map("users")
+}
+
+// ============================================
+// RECIPES
+// ============================================
+
+model Recipe {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  servings    Int      @default(1)
+  prepTime    Int? // minutes
+  cookTime    Int? // minutes
+  totalTime   Int? // minutes
+  
+  // Metadata
+  source      String? // URL or book name
+  imageUrl    String?
+  rating      Int? // 1-5
+  notes       String?
+  timesCooked Int      @default(0)
+  lastCookedAt DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeIngredients   RecipeIngredient[]
+  instructions        Instruction[]
+  tags                RecipeTag[]
+  bakingParameters    BakingParameters?
+  versions            RecipeVersion[]
+
+  @@index([userId])
+  @@map("recipes")
+}
+
+// ============================================
+// INGREDIENTS
+// ============================================
+
+model Ingredient {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  nameHebrew  String?
+  category    String // flour, sugar, fat, protein, leavening, liquid, spice, other
+  scalingRule String  @default("linear") // linear, logarithmic, squareRoot, fixed
+
+  // Nutritional info (per 100g)
+  calories    Float?
+  protein     Float?
+  carbs       Float?
+  fat         Float?
+  fiber       Float?
+
+  // Additional info
+  allergens   String[] // array of allergen tags
+  storageInfo String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  recipeIngredients RecipeIngredient[]
+  conversions       UnitConversion[]
+
+  @@map("ingredients")
+}
+
+model RecipeIngredient {
+  id           String  @id @default(cuid())
+  recipeId     String
+  ingredientId String
+  amount       Float
+  unit         String // g, ml, cup, tsp, tbsp, etc
+  
+  // Optional fields
+  preparation  String? // "chopped", "melted", "sifted"
+  optional     Boolean @default(false)
+  
+  // Custom scaling (override ingredient default)
+  scalingRule  String? // if different from ingredient default
+
+  // Relations
+  recipe     Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@index([recipeId])
+  @@index([ingredientId])
+  @@map("recipe_ingredients")
+}
+
+// ============================================
+// INSTRUCTIONS
+// ============================================
+
+model Instruction {
+  id          String   @id @default(cuid())
+  recipeId    String
+  stepNumber  Int
+  description String
+  imageUrl    String?
+  time        Int? // minutes for this step
+  
+  createdAt   DateTime @default(now())
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, stepNumber])
+  @@map("instructions")
+}
+
+// ============================================
+// BAKING PARAMETERS
+// ============================================
+
+model BakingParameters {
+  id              String  @id @default(cuid())
+  recipeId        String  @unique
+  
+  // Oven settings
+  ovenTemp        Int? // celsius
+  ovenTempF       Int? // fahrenheit
+  convection      Boolean @default(false)
+  rackPosition    String? // upper, middle, lower
+  
+  // Pan/Dish info
+  panType         String? // "round cake pan", "loaf pan", "sheet pan"
+  panSize         String? // "9 inch", "23cm"
+  panMaterial     String? // "metal", "glass", "silicone"
+  
+  // Times (will be scaled)
+  baseServings    Int // the servings this time is based on
+  bakingTime      Int? // minutes
+  restingTime     Int? // minutes (for bread, cookies)
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@map("baking_parameters")
+}
+
+// ============================================
+// TAGS
+// ============================================
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String? // hex color for UI
+  createdAt DateTime @default(now())
+
+  // Relations
+  recipes RecipeTag[]
+
+  @@map("tags")
+}
+
+model RecipeTag {
+  id       String @id @default(cuid())
+  recipeId String
+  tagId    String
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, tagId])
+  @@index([recipeId])
+  @@index([tagId])
+  @@map("recipe_tags")
+}
+
+// ============================================
+// RECIPE VERSIONS
+// ============================================
+
+model RecipeVersion {
+  id          String   @id @default(cuid())
+  recipeId    String
+  version     Int
+  title       String
+  changes     String // description of what changed
+  data        Json // snapshot of the recipe at this version
+  isPreferred Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, version])
+  @@index([recipeId])
+  @@map("recipe_versions")
+}
+
+// ============================================
+// UNIT CONVERSIONS
+// ============================================
+
+model UnitConversion {
+  id           String  @id @default(cuid())
+  ingredientId String? // null = general conversion
+  fromUnit     String
+  toUnit       String
+  factor       Float // multiply by this to convert
+  
+  // Relations
+  ingredient Ingredient? @relation(fields: [ingredientId], references: [id])
+
+  @@unique([ingredientId, fromUnit, toUnit])
+  @@index([fromUnit, toUnit])
+  @@map("unit_conversions")
+}
