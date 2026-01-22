@@ -57,7 +57,7 @@ export default function PremiumComponentsDemo() {
           {/* --- BUTTONS SECTION --- */}
           <Box>
             <SectionTitle icon={Sparkles} title="כפתורים ואינטראקציה" />
-            <Card.Root variant="raised" borderRadius="3xl" boxShadow="sm" border="none">
+            <Card.Root variant="elevated" borderRadius="3xl" boxShadow="sm" border="none">
               <Card.Body p={10}>
                 <Stack gap={10}>
                   <Box>
@@ -100,7 +100,7 @@ export default function PremiumComponentsDemo() {
           {/* --- INPUTS SECTION --- */}
           <Box>
             <SectionTitle icon={Search} title="שדות קלט וטפסים" />
-            <Card.Root variant="raised" borderRadius="3xl" boxShadow="sm">
+            <Card.Root variant="elevated" borderRadius="3xl" boxShadow="sm">
               <Card.Body p={10}>
                 <SimpleGrid columns={{ base: 1, md: 2 }} gap={10}>
                   <Field.Root>

@@ -13,18 +13,56 @@ import {
   SimpleGrid,
   Card,
   Center,
+  Spinner,
 } from '@chakra-ui/react';
 import Link from 'next/link';
-import { Plus, Search, ChefHat, Sparkles, Heart, Tag, BookOpen, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
+import { Plus, Search, ChefHat, Sparkles, Heart, Tag, BookOpen, Link as LinkIcon, Image as ImageIcon, Clock, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+interface Recipe {
+  id: string;
+  title: string;
+  description?: string;
+  servings: number;
+  prepTime?: number;
+  cookTime?: number;
+  recipeIngredients: Array<{ ingredient: { name: string } }>;
+  instructions: Array<{ content: string }>;
+}
 
 export default function RecipesPage() {
-  const recipes = [];
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const response = await fetch('/api/recipes');
+        if (!response.ok) throw new Error('Failed to fetch');
+        const data = await response.json();
+        setRecipes(data);
+      } catch (error) {
+        console.error('Error fetching recipes:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipes();
+  }, []);
+
+  const filteredRecipes = recipes.filter(recipe =>
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
 
   return (
     <Box minH="100vh" bg="gray.50" dir="rtl" w="100%">
       {/* Header - חלק עליון */}
       <Box bg="white" borderBottom="1px" borderColor="gray.200" boxShadow="sm" w="100%">
-        {/* הוספתי maxW ו-mx="auto" למרכוז מלא */}
         <Container maxW="5xl" mx="auto" py={12} px={6}>
           <Stack gap={8}>
             {/* כותרת וכפתור הוספה */}
@@ -65,6 +103,8 @@ export default function RecipesPage() {
                 fontSize="md"
                 pr={14}
                 borderWidth="2px"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 _focus={{ borderColor: 'orange.400', bg: 'white', boxShadow: '0 4px 20px rgba(249, 115, 22, 0.1)' }}
               />
               <Box
@@ -81,7 +121,7 @@ export default function RecipesPage() {
             {/* סטטיסטיקות */}
             <Center>
               <HStack gap={{ base: 4, md: 10 }} flexWrap="wrap" justify="center">
-                <StatItem icon={BookOpen} label="מתכונים" count={0} color="blue" />
+                <StatItem icon={BookOpen} label="מתכונים" count={recipes.length} color="blue" />
                 <StatItem icon={Heart} label="מועדפים" count={0} color="red" />
                 <StatItem icon={Tag} label="תגיות" count={0} color="purple" />
               </HStack>
@@ -92,13 +132,79 @@ export default function RecipesPage() {
 
       {/* Main Content Area - תוכן מרכזי */}
       <Container maxW="5xl" mx="auto" py={16} px={6}>
-        {recipes.length === 0 ? (
+        {loading ? (
+          <Center w="full" h="400px">
+            <Spinner size="xl" color="orange.500" />
+          </Center>
+        ) : filteredRecipes.length === 0 ? (
           <Center w="full">
             <EmptyState />
           </Center>
         ) : (
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-            {/* כאן ייכנסו כרטיסי המתכונים */}
+            {filteredRecipes.map(recipe => (
+              <Link href={`/dashboard/recipes/${recipe.id}`} key={recipe.id} style={{ textDecoration: 'none' }}>
+                <Card.Root 
+                  variant="outline" 
+                  bg="white" 
+                  borderRadius="2xl"
+                  overflow="hidden"
+                  transition="all 0.3s ease"
+                  _hover={{
+                    boxShadow: 'lg',
+                    transform: 'translateY(-4px)',
+                    borderColor: 'orange.300'
+                  }}
+                  h="full"
+                >
+                  <Card.Body p={6}>
+                    <Stack gap={4} h="full">
+                      <Stack gap={2}>
+                        <Heading size="md" color="gray.800" noOfLines={2}>
+                          {recipe.title}
+                        </Heading>
+                        {recipe.description && (
+                          <Text color="gray.500" fontSize="sm" noOfLines={2}>
+                            {recipe.description}
+                          </Text>
+                        )}
+                      </Stack>
+
+                      <HStack gap={4} fontSize="sm" color="gray.600">
+                        <HStack gap={1}>
+                          <Users size={16} />
+                          <Text>{recipe.servings} מנות</Text>
+                        </HStack>
+                        {recipe.cookTime && (
+                          <HStack gap={1}>
+                            <Clock size={16} />
+                            <Text>{recipe.cookTime} דקות</Text>
+                          </HStack>
+                        )}
+                      </HStack>
+
+                      <Stack gap={2} mt="auto">
+                        <Text color="gray.500" fontSize="xs">
+                          {recipe.recipeIngredients.length} מרכיבים
+                        </Text>
+                        <HStack gap={2} flexWrap="wrap">
+                          {recipe.recipeIngredients.slice(0, 3).map((ing, idx) => (
+                            <Badge key={idx} bg="orange.50" color="orange.600" fontSize="xs">
+                              {ing.ingredient.name}
+                            </Badge>
+                          ))}
+                          {recipe.recipeIngredients.length > 3 && (
+                            <Badge bg="gray.100" color="gray.600" fontSize="xs">
+                              +{recipe.recipeIngredients.length - 3} עוד
+                            </Badge>
+                          )}
+                        </HStack>
+                      </Stack>
+                    </Stack>
+                  </Card.Body>
+                </Card.Root>
+              </Link>
+            ))}
           </SimpleGrid>
         )}
       </Container>

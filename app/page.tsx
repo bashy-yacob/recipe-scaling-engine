@@ -104,7 +104,7 @@ export default function HomePage() {
 
         {/* Status Card - סטטוס פרויקט ממורכז */}
         <Box maxW="2xl" mx="auto">
-          <Card.Root variant="raised" borderRadius="3xl" overflow="hidden" boxShadow="sm">
+          <Card.Root variant="elevated" borderRadius="3xl" overflow="hidden" boxShadow="sm">
             <Card.Header bg="gray.50" px={8} py={5} borderBottomWidth="1px">
               <HStack justify="space-between">
                 <Heading size="md">סטטוס פיתוח המערכת</Heading>

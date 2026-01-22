@@ -3,16 +3,18 @@
 import { useState, KeyboardEvent, useRef } from 'react';
 import {
   Box, Container, Heading, Text, Button, Input, Textarea, Card,
-  HStack, Stack, Badge, Field, Grid, IconButton, SimpleGrid,
+  HStack, Stack, Badge, Field, Grid, IconButton, SimpleGrid, useToast,
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { ArrowRight, Save, Plus, Trash2, Image as ImageIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Ingredient {
   id: string;
   name: string;
   amount: string;
   unit: string;
+  scalingRule?: string;
 }
 
 interface Instruction {
@@ -21,18 +23,26 @@ interface Instruction {
 }
 
 export default function NewRecipePage() {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [servings, setServings] = useState('4');
+  const [prepTime, setPrepTime] = useState('');
+  const [cookTime, setCookTime] = useState('');
   const [ingredients, setIngredients] = useState<Ingredient[]>([
     { id: '1', name: '', amount: '', unit: 'גרם' },
   ]);
   const [instructions, setInstructions] = useState<Instruction[]>([
     { id: '1', description: '' },
   ]);
+  const [loading, setLoading] = useState(false);
 
   const ingredientsRef = useRef<HTMLDivElement>(null);
   const instructionsRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const toast = useToast();
 
   const addIngredient = () => {
-    setIngredients(prev => [...prev, { id: Date.now().toString(), name: '', amount: '', unit: '' }]);
+    setIngredients(prev => [...prev, { id: Date.now().toString(), name: '', amount: '', unit: 'גרם' }]);
   };
 
   const addInstruction = () => {
@@ -47,7 +57,58 @@ export default function NewRecipePage() {
     if (instructions.length > 1) setInstructions(instructions.filter(inst => inst.id !== id));
   };
 
-  // לוגיקת אנטר למרכיבים: עובר תא תא, ורק בסוף שורה מוסיף חדשה
+  const handleSave = async () => {
+    // Validation
+    if (!title.trim()) {
+      toast.create({ title: 'שם המתכון חובה', type: 'error' });
+      return;
+    }
+
+    const validIngredients = ingredients.filter(ing => ing.name.trim() && ing.amount.trim());
+    if (validIngredients.length === 0) {
+      toast.create({ title: 'צריך לפחות מרכיב אחד', type: 'error' });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/recipes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          description,
+          servings: parseInt(servings) || 1,
+          prepTime: prepTime ? parseInt(prepTime) : 0,
+          cookTime: cookTime ? parseInt(cookTime) : 0,
+          ingredients: validIngredients.map(ing => ({
+            name: ing.name,
+            amount: parseFloat(ing.amount) || 0,
+            unit: ing.unit || 'גרם',
+            scalingRule: ing.scalingRule || 'linear',
+          })),
+          instructions: instructions
+            .filter(inst => inst.description.trim())
+            .map((inst, idx) => ({
+              content: inst.description,
+              order: idx,
+            })),
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to save');
+
+      toast.create({ title: 'המתכון נשמר בהצלחה!', type: 'success' });
+      router.push('/dashboard/recipes');
+    } catch (error) {
+      console.error('Error:', error);
+      toast.create({ title: 'שגיאה בשמירה', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // לוגיקת אנטר למרכיבים
   const handleIngredientKeyDown = (e: KeyboardEvent<HTMLInputElement>, rowIndex: number, fieldIndex: number) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -104,7 +165,15 @@ export default function NewRecipePage() {
               </Button>
               <Heading size="md" fontWeight="bold">מתכון חדש</Heading>
             </HStack>
-            <Button bg="orange.500" color="white" _hover={{ bg: 'orange.600' }} size="sm" px={6}>
+            <Button 
+              bg="orange.500" 
+              color="white" 
+              _hover={{ bg: 'orange.600' }} 
+              size="sm" 
+              px={6}
+              onClick={handleSave}
+              loading={loading}
+            >
               <Save size={18} style={{ marginLeft: '6px' }} /> שמור מתכון
             </Button>
           </HStack>
@@ -115,24 +184,57 @@ export default function NewRecipePage() {
         <Stack gap={8}>
           
           {/* פרטים בסיסיים */}
-          <Card.Root variant="raised" boxShadow="sm" borderRadius="xl">
+          <Card.Root variant="elevated" boxShadow="sm" borderRadius="xl">
             <Card.Header px={8} pt={8}><Heading size="md">פרטים בסיסיים</Heading></Card.Header>
             <Card.Body px={8} pb={8}>
               <Stack gap={6}>
-                <Field.Root required>
+              <Field.Root required>
                   <Field.Label fontWeight="bold">שם המתכון</Field.Label>
-                  <Input placeholder="לדוגמה: עוגת שוקולד חמה" size="lg" />
+                  <Input 
+                    placeholder="לדוגמה: עוגת שוקולד חמה" 
+                    size="lg"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
                 </Field.Root>
 
                 <Field.Root>
                   <Field.Label fontWeight="bold">תיאור קצר</Field.Label>
-                  <Textarea placeholder="ספרי בכמה מילים על המתכון..." rows={2} />
+                  <Textarea 
+                    placeholder="ספרי בכמה מילים על המתכון..." 
+                    rows={2}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
                 </Field.Root>
 
                 <SimpleGrid columns={{ base: 1, md: 3 }} gap={6}>
-                  <Field.Root required><Field.Label fontWeight="bold">מנות</Field.Label><Input type="number" defaultValue="4" /></Field.Root>
-                  <Field.Root><Field.Label fontWeight="bold">זמן הכנה (דק')</Field.Label><Input placeholder="30" /></Field.Root>
-                  <Field.Root><Field.Label fontWeight="bold">זמן אפייה (דק')</Field.Label><Input placeholder="45" /></Field.Root>
+                  <Field.Root required>
+                    <Field.Label fontWeight="bold">מנות</Field.Label>
+                    <Input 
+                      type="number" 
+                      value={servings}
+                      onChange={(e) => setServings(e.target.value)}
+                    />
+                  </Field.Root>
+                  <Field.Root>
+                    <Field.Label fontWeight="bold">זמן הכנה (דק')</Field.Label>
+                    <Input 
+                      placeholder="30"
+                      type="number"
+                      value={prepTime}
+                      onChange={(e) => setPrepTime(e.target.value)}
+                    />
+                  </Field.Root>
+                  <Field.Root>
+                    <Field.Label fontWeight="bold">זמן אפייה (דק')</Field.Label>
+                    <Input 
+                      placeholder="45"
+                      type="number"
+                      value={cookTime}
+                      onChange={(e) => setCookTime(e.target.value)}
+                    />
+                  </Field.Root>
                 </SimpleGrid>
 
                 {/* תמונה (החלק שהיה חסר) */}
@@ -155,7 +257,7 @@ export default function NewRecipePage() {
           </Card.Root>
 
           {/* מרכיבים */}
-          <Card.Root variant="raised" boxShadow="sm" borderRadius="xl">
+          <Card.Root variant="elevated" boxShadow="sm" borderRadius="xl">
             <Card.Header px={8} pt={8} borderBottomWidth="1px" pb={4} mb={4}>
               <HStack justify="space-between">
                 <Heading size="md">מרכיבים</Heading>
@@ -169,9 +271,37 @@ export default function NewRecipePage() {
                 {ingredients.map((ing, idx) => (
                   <Grid key={ing.id} data-row={idx} templateColumns="40px 2fr 1fr 1fr 40px" gap={3} alignItems="center">
                     <Text fontWeight="bold" color="orange.500" textAlign="center">{idx + 1}</Text>
-                    <Input placeholder="מרכיב" onKeyDown={(e) => handleIngredientKeyDown(e, idx, 0)} />
-                    <Input placeholder="כמות" type="text" onKeyDown={(e) => handleIngredientKeyDown(e, idx, 1)} />
-                    <Input placeholder="יחידה" onKeyDown={(e) => handleIngredientKeyDown(e, idx, 2)} />
+                    <Input 
+                      placeholder="מרכיב" 
+                      value={ing.name}
+                      onChange={(e) => {
+                        const newIng = [...ingredients];
+                        newIng[idx].name = e.target.value;
+                        setIngredients(newIng);
+                      }}
+                      onKeyDown={(e) => handleIngredientKeyDown(e, idx, 0)} 
+                    />
+                    <Input 
+                      placeholder="כמות" 
+                      type="text" 
+                      value={ing.amount}
+                      onChange={(e) => {
+                        const newIng = [...ingredients];
+                        newIng[idx].amount = e.target.value;
+                        setIngredients(newIng);
+                      }}
+                      onKeyDown={(e) => handleIngredientKeyDown(e, idx, 1)} 
+                    />
+                    <Input 
+                      placeholder="יחידה" 
+                      value={ing.unit}
+                      onChange={(e) => {
+                        const newIng = [...ingredients];
+                        newIng[idx].unit = e.target.value;
+                        setIngredients(newIng);
+                      }}
+                      onKeyDown={(e) => handleIngredientKeyDown(e, idx, 2)} 
+                    />
                     <IconButton variant="ghost" colorPalette="red" onClick={() => removeIngredient(ing.id)} disabled={ingredients.length === 1}>
                       <Trash2 size={18} />
                     </IconButton>
@@ -182,7 +312,7 @@ export default function NewRecipePage() {
           </Card.Root>
 
           {/* שלבי הכנה */}
-          <Card.Root variant="raised" boxShadow="sm" borderRadius="xl">
+          <Card.Root variant="elevated" boxShadow="sm" borderRadius="xl">
             <Card.Header px={8} pt={8} borderBottomWidth="1px" pb={4} mb={4}>
               <HStack justify="space-between">
                 <Heading size="md">שלבי הכנה</Heading>
@@ -202,6 +332,12 @@ export default function NewRecipePage() {
                       flex={1}
                       placeholder="מה עושים בשלב הזה?"
                       rows={2}
+                      value={inst.description}
+                      onChange={(e) => {
+                        const newInst = [...instructions];
+                        newInst[idx].description = e.target.value;
+                        setInstructions(newInst);
+                      }}
                       onKeyDown={(e) => handleInstructionKeyDown(e, idx)}
                     />
                     <IconButton variant="ghost" colorPalette="red" onClick={() => removeInstruction(inst.id)} disabled={instructions.length === 1}>
@@ -214,7 +350,7 @@ export default function NewRecipePage() {
           </Card.Root>
 
           {/* תגיות (החלק שהיה חסר) */}
-          <Card.Root variant="raised" boxShadow="sm" borderRadius="xl">
+          <Card.Root variant="elevated" boxShadow="sm" borderRadius="xl">
             <Card.Header px={8} pt={8}><Heading size="md">תגיות</Heading></Card.Header>
             <Card.Body px={8} pb={8}>
               <Stack gap={4}>
@@ -232,7 +368,16 @@ export default function NewRecipePage() {
 
           {/* כפתור שמירה סופי */}
           <Box textAlign="center" py={10}>
-            <Button size="xl" bg="orange.500" color="white" _hover={{ bg: 'orange.600' }} px={20} boxShadow="lg">
+            <Button 
+              size="xl" 
+              bg="orange.500" 
+              color="white" 
+              _hover={{ bg: 'orange.600' }} 
+              px={20} 
+              boxShadow="lg"
+              onClick={handleSave}
+              loading={loading}
+            >
               <Save size={22} style={{ marginLeft: '10px' }} /> שמור מתכון ופרסם
             </Button>
           </Box>
