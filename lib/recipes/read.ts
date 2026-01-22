@@ -17,7 +17,7 @@ export async function getUserRecipes(userId: string) {
         },
         instructions: {
           orderBy: {
-            order: 'asc',
+            stepNumber: 'asc',
           },
         },
         user: true,
@@ -45,13 +45,10 @@ export async function getRecipeById(recipeId: string) {
           include: {
             ingredient: true,
           },
-          orderBy: {
-            order: 'asc',
-          },
         },
         instructions: {
           orderBy: {
-            order: 'asc',
+            stepNumber: 'asc',
           },
         },
         user: true,
@@ -88,7 +85,7 @@ export async function getRecipesByTag(userId: string, tagName: string) {
         },
         instructions: {
           orderBy: {
-            order: 'asc',
+            stepNumber: 'asc',
           },
         },
         user: true,
@@ -113,8 +110,8 @@ export async function searchRecipes(userId: string, query: string) {
       where: {
         userId,
         OR: [
-          { title: { contains: query, mode: 'insensitive' } },
-          { description: { contains: query, mode: 'insensitive' } },
+          { title: { contains: query } },
+          { description: { contains: query } },
         ],
       },
       include: {
@@ -125,7 +122,7 @@ export async function searchRecipes(userId: string, query: string) {
         },
         instructions: {
           orderBy: {
-            order: 'asc',
+            stepNumber: 'asc',
           },
         },
         user: true,

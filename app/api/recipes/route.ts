@@ -41,6 +41,7 @@ export async function POST(request: Request) {
     return Response.json(recipe, { status: 201 });
   } catch (error) {
     console.error('Error creating recipe:', error);
-    return Response.json({ error: 'Failed to create recipe' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to create recipe';
+    return Response.json({ error: message }, { status: 500 });
   }
 }

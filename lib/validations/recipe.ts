@@ -4,16 +4,14 @@ import { z } from 'zod';
 
 export const ingredientSchema = z.object({
   name: z.string().min(1, 'שם המרכיב חובה'),
-  amount: z.number().positive('כמות חייבת להיות חיובית'),
+  amount: z.number().nullable().optional(), // null or undefined = not filled yet
   unit: z.string().min(1, 'יחידת מידה חובה'),
-  scalingRule: z.enum(['linear', 'logarithmic', 'sqrt', 'fixed'], {
-    errorMap: () => ({ message: 'סוג scaling לא תקין' }),
-  }),
+  scalingRule: z.enum(['linear', 'logarithmic', 'sqrt', 'fixed']).default('linear'),
 });
 
 export const instructionSchema = z.object({
   content: z.string().min(1, 'הוראה חובה'),
-  order: z.number().int().positive(),
+  order: z.number().int().nonnegative(),
 });
 
 export const recipeSchema = z.object({
@@ -22,7 +20,8 @@ export const recipeSchema = z.object({
   prepTime: z.number().int().nonnegative('זמן הכנה לא יכול להיות שלילי').optional(),
   cookTime: z.number().int().nonnegative('זמן בישול לא יכול להיות שלילי').optional(),
   ingredients: z.array(ingredientSchema).min(1, 'צריך לפחות מרכיב אחד'),
-  instructions: z.array(instructionSchema).optional(),
+  instructions: z.array(instructionSchema).optional().default([]),
+  isComplete: z.boolean().optional().default(true),
 });
 
 export type Ingredient = z.infer<typeof ingredientSchema>;

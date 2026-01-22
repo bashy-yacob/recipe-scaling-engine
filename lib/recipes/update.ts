@@ -10,6 +10,7 @@ export interface UpdateRecipeInput {
   cookTime?: number;
   rating?: number;
   notes?: string;
+  isComplete?: boolean;
 }
 
 /**
@@ -26,6 +27,7 @@ export async function updateRecipe(recipeId: string, input: UpdateRecipeInput) {
     if (input.cookTime !== undefined) updateData.cookTime = input.cookTime;
     if (input.rating !== undefined) updateData.rating = input.rating;
     if (input.notes) updateData.notes = input.notes;
+    if (input.isComplete !== undefined) updateData.isComplete = input.isComplete;
 
     // Calculate total time if prep or cook time changed
     if (input.prepTime !== undefined || input.cookTime !== undefined) {
@@ -52,7 +54,7 @@ export async function updateRecipe(recipeId: string, input: UpdateRecipeInput) {
         },
         instructions: {
           orderBy: {
-            order: 'asc',
+            stepNumber: 'asc',
           },
         },
       },
@@ -72,7 +74,7 @@ export async function updateRecipeIngredients(
   recipeId: string,
   ingredients: Array<{
     name: string;
-    amount: number;
+    amount: number | null;
     unit: string;
     scalingRule?: string;
   }>
@@ -108,11 +110,10 @@ export async function updateRecipeIngredients(
       where: { id: recipeId },
       data: {
         recipeIngredients: {
-          create: ingredientData.map((ing, index) => ({
+          create: ingredientData.map((ing) => ({
             ingredientId: ing.ingredientId,
             amount: ing.amount,
             unit: ing.unit,
-            order: index,
           })),
         },
       },
@@ -124,7 +125,7 @@ export async function updateRecipeIngredients(
         },
         instructions: {
           orderBy: {
-            order: 'asc',
+            stepNumber: 'asc',
           },
         },
       },
@@ -159,8 +160,8 @@ export async function updateRecipeInstructions(
       data: {
         instructions: {
           create: instructions.map((inst) => ({
-            content: inst.content,
-            order: inst.order,
+            stepNumber: inst.order,
+            description: inst.content,
           })),
         },
       },
@@ -172,7 +173,7 @@ export async function updateRecipeInstructions(
         },
         instructions: {
           orderBy: {
-            order: 'asc',
+            stepNumber: 'asc',
           },
         },
       },

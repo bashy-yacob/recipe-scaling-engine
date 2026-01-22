@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db';
 import { getRecipeById } from '@/lib/recipes/read';
-import { updateRecipe } from '@/lib/recipes/update';
+import { updateRecipe, updateRecipeIngredients, updateRecipeInstructions } from '@/lib/recipes/update';
 import { deleteRecipe } from '@/lib/recipes/delete';
 
 export async function GET(
@@ -32,7 +32,26 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    const recipe = await updateRecipe(id, body);
+    // Update basic recipe info
+    let recipe = await updateRecipe(id, {
+      title: body.title,
+      description: body.description,
+      servings: body.servings,
+      prepTime: body.prepTime,
+      cookTime: body.cookTime,
+      isComplete: body.isComplete,
+    });
+
+    // Update ingredients if provided
+    if (body.ingredients && Array.isArray(body.ingredients)) {
+      recipe = await updateRecipeIngredients(id, body.ingredients);
+    }
+
+    // Update instructions if provided
+    if (body.instructions && Array.isArray(body.instructions)) {
+      recipe = await updateRecipeInstructions(id, body.instructions);
+    }
+
     return Response.json(recipe);
   } catch (error) {
     console.error('Error updating recipe:', error);

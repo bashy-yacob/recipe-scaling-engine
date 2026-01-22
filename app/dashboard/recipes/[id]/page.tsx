@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   Box, Container, Heading, Text, Button, HStack, Stack, Badge, SimpleGrid,
-  Card, Center, Spinner, Tabs, useToast,
+  Card, Center, Spinner, Tabs,
 } from '@chakra-ui/react';
+import { toaster } from '@/components/ui/toaster';
 import Link from 'next/link';
 import { ArrowRight, Edit2, Trash2, Share2, Heart, Clock, Users } from 'lucide-react';
 
@@ -18,13 +19,12 @@ interface Recipe {
   cookTime?: number;
   totalTime?: number;
   recipeIngredients: Array<{ ingredient: { name: string }; amount: number; unit: string }>;
-  instructions: Array<{ content: string; order: number }>;
+  instructions: Array<{ description: string; stepNumber: number }>;
 }
 
 export default function RecipeDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const toast = useToast();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [servingMultiplier, setServingMultiplier] = useState(1);
@@ -40,14 +40,14 @@ export default function RecipeDetailPage() {
         setRecipe(data);
       } catch (error) {
         console.error('Error fetching recipe:', error);
-        toast.create({ title: 'שגיאה בטעינה', type: 'error' });
+        toaster.create({ title: 'שגיאה בטעינה', type: 'error' });
       } finally {
         setLoading(false);
       }
     };
 
     fetchRecipe();
-  }, [recipeId, toast]);
+  }, [recipeId]);
 
   const handleDelete = async () => {
     if (!confirm('בטוח שברצונך למחוק את המתכון?')) return;
@@ -58,11 +58,11 @@ export default function RecipeDetailPage() {
       });
       if (!response.ok) throw new Error('Failed to delete');
 
-      toast.create({ title: 'המתכון נמחק בהצלחה', type: 'success' });
+      toaster.create({ title: 'המתכון נמחק בהצלחה', type: 'success' });
       router.push('/dashboard/recipes');
     } catch (error) {
       console.error('Error:', error);
-      toast.create({ title: 'שגיאה בעדכון', type: 'error' });
+      toaster.create({ title: 'שגיאה בעדכון', type: 'error' });
     }
   };
 
@@ -196,13 +196,13 @@ export default function RecipeDetailPage() {
               <Card.Body px={8} pb={8}>
                 <Stack gap={6}>
                   {recipe.instructions
-                    .sort((a, b) => a.order - b.order)
+                    .sort((a, b) => a.stepNumber - b.stepNumber)
                     .map((inst, idx) => (
                       <HStack key={idx} gap={4} align="start">
                         <Badge bg="orange.500" color="white" borderRadius="full" minW="32px" h="32px" display="flex" alignItems="center" justifyContent="center">
                           {idx + 1}
                         </Badge>
-                        <Text>{inst.content}</Text>
+                        <Text>{inst.description}</Text>
                       </HStack>
                     ))}
                 </Stack>

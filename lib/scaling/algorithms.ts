@@ -121,7 +121,8 @@ export function scaleRecipe(
     ...ing,
     scaledAmount: scaleIngredient(
       {
-        ...ing,
+        type: ing.scalingRule,
+        baseAmount: ing.amount,
         baseServings: baseServings || ing.baseServings,
       },
       targetServings

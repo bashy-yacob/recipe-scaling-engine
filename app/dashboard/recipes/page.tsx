@@ -16,7 +16,7 @@ import {
   Spinner,
 } from '@chakra-ui/react';
 import Link from 'next/link';
-import { Plus, Search, ChefHat, Sparkles, Heart, Tag, BookOpen, Link as LinkIcon, Image as ImageIcon, Clock, Users } from 'lucide-react';
+import { Plus, Search, ChefHat, Sparkles, Heart, Tag, BookOpen, Link as LinkIcon, Image as ImageIcon, Clock, Users, AlertTriangle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -27,6 +27,7 @@ interface Recipe {
   servings: number;
   prepTime?: number;
   cookTime?: number;
+  isComplete?: boolean;
   recipeIngredients: Array<{ ingredient: { name: string } }>;
   instructions: Array<{ content: string }>;
 }
@@ -160,11 +161,30 @@ export default function RecipesPage() {
                   <Card.Body p={6}>
                     <Stack gap={4} h="full">
                       <Stack gap={2}>
-                        <Heading size="md" color="gray.800" noOfLines={2}>
-                          {recipe.title}
-                        </Heading>
+                        <HStack justify="space-between" align="start">
+                          <Heading size="md" color="gray.800" lineClamp={2}>
+                            {recipe.title}
+                          </Heading>
+                          {recipe.isComplete === false && (
+                            <Badge 
+                              bg="yellow.100" 
+                              color="yellow.700" 
+                              fontSize="xs"
+                              px={2}
+                              py={1}
+                              borderRadius="md"
+                              display="flex"
+                              alignItems="center"
+                              gap={1}
+                              flexShrink={0}
+                            >
+                              <AlertTriangle size={12} />
+                              לא מושלם
+                            </Badge>
+                          )}
+                        </HStack>
                         {recipe.description && (
-                          <Text color="gray.500" fontSize="sm" noOfLines={2}>
+                          <Text color="gray.500" fontSize="sm" lineClamp={2}>
                             {recipe.description}
                           </Text>
                         )}

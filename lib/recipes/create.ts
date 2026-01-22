@@ -11,9 +11,10 @@ export interface CreateRecipeInput {
   servings?: number;
   prepTime?: number;
   cookTime?: number;
+  isComplete?: boolean;
   ingredients: Array<{
     name: string;
-    amount: number;
+    amount: number | null;
     unit: string;
     scalingRule?: 'linear' | 'logarithmic' | 'sqrt' | 'fixed';
   }>;
@@ -68,14 +69,14 @@ export async function createRecipe(input: CreateRecipeInput) {
         prepTime: validated.prepTime,
         cookTime: validated.cookTime,
         totalTime: (validated.prepTime || 0) + (validated.cookTime || 0),
+        isComplete: input.isComplete ?? true,
         
         // Create recipe ingredients
         recipeIngredients: {
-          create: ingredientData.map((ing, index) => ({
+          create: ingredientData.map((ing) => ({
             ingredientId: ing.ingredientId,
             amount: ing.amount,
             unit: ing.unit,
-            order: index,
           })),
         },
 
@@ -83,8 +84,8 @@ export async function createRecipe(input: CreateRecipeInput) {
         instructions: input.instructions
           ? {
               create: input.instructions.map((inst) => ({
-                content: inst.content,
-                order: inst.order,
+                stepNumber: inst.order,
+                description: inst.content,
               })),
             }
           : undefined,
@@ -97,7 +98,7 @@ export async function createRecipe(input: CreateRecipeInput) {
         },
         instructions: {
           orderBy: {
-            order: 'asc',
+            stepNumber: 'asc',
           },
         },
         user: true,

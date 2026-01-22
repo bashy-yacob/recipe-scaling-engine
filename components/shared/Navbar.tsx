@@ -8,14 +8,16 @@ import {
   Button,
   Circle,
   IconButton,
-  Stack,
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChefHat, Plus, BookOpen, Layout, Home, Menu } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
+import { ChefHat, Plus, BookOpen, Layout, Home, Menu, LogIn, LogOut, User, Settings } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { data: session, status } = useSession();
+  const isLoading = status === 'loading';
 
   return (
     <Box
@@ -48,28 +50,72 @@ export default function Navbar() {
           <HStack gap={1} display={{ base: 'none', md: 'flex' }} flex={1} justify="center">
             <NavLink href="/" active={pathname === '/'} icon={Home}>דף הבית</NavLink>
             <NavLink href="/dashboard/recipes" active={pathname?.includes('/recipes')} icon={BookOpen}>המתכונים שלי</NavLink>
+            {session && <NavLink href="/settings" active={pathname === '/settings'} icon={Settings}>הגדרות</NavLink>}
             <NavLink href="/demo" active={pathname === '/demo'} icon={Layout}>UI Kit</NavLink>
           </HStack>
 
           {/* כפתור פעולה */}
           <HStack gap={3}>
-            <Button
-              asChild
-              bg="orange.500"
-              color="white"
-              size="md"
-              borderRadius="xl"
-              px={5}
-              boxShadow="0 4px 12px rgba(249, 115, 22, 0.2)"
-              _hover={{ bg: 'orange.600', transform: 'translateY(-1px)' }}
-              _active={{ transform: 'translateY(0)' }}
-              transition="all 0.2s"
-            >
-              <Link href="/dashboard/recipes/new">
-                <Plus size={18} style={{ marginLeft: '6px' }} />
-                <Text fontWeight="bold" fontSize="sm">חדש</Text>
-              </Link>
-            </Button>
+            {/* כפתורי Auth */}
+            {isLoading ? (
+              <Box w="80px" />
+            ) : session ? (
+              <>
+                <HStack gap={2} display={{ base: 'none', sm: 'flex' }}>
+                  <Circle bg="orange.100" p={2}>
+                    <User size={16} color="#ea580c" />
+                  </Circle>
+                  <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                    {session.user?.name || session.user?.email?.split('@')[0]}
+                  </Text>
+                </HStack>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  color="gray.500"
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  _hover={{ bg: 'red.50', color: 'red.500' }}
+                >
+                  <LogOut size={18} />
+                  <Text display={{ base: 'none', md: 'block' }} mr={1}>יציאה</Text>
+                </Button>
+              </>
+            ) : (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                borderRadius="xl"
+                borderColor="orange.200"
+                color="orange.600"
+                _hover={{ bg: 'orange.50' }}
+              >
+                <Link href="/auth/login">
+                  <LogIn size={16} style={{ marginLeft: '6px' }} />
+                  <Text fontWeight="bold" fontSize="sm">התחבר</Text>
+                </Link>
+              </Button>
+            )}
+
+            {session && (
+              <Button
+                asChild
+                bg="orange.500"
+                color="white"
+                size="md"
+                borderRadius="xl"
+                px={5}
+                boxShadow="0 4px 12px rgba(249, 115, 22, 0.2)"
+                _hover={{ bg: 'orange.600', transform: 'translateY(-1px)' }}
+                _active={{ transform: 'translateY(0)' }}
+                transition="all 0.2s"
+              >
+                <Link href="/dashboard/recipes/new">
+                  <Plus size={18} style={{ marginLeft: '6px' }} />
+                  <Text fontWeight="bold" fontSize="sm">חדש</Text>
+                </Link>
+              </Button>
+            )}
 
             {/* כפתור תפריט לנייד (יופיע רק במסכים קטנים) */}
             <IconButton
