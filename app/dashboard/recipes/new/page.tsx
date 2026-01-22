@@ -7,7 +7,7 @@ import {
 } from '@chakra-ui/react';
 import { toaster } from '@/components/ui/toaster';
 import Link from 'next/link';
-import { ArrowRight, Save, Plus, Trash2, Image as ImageIcon } from 'lucide-react';
+import { ArrowRight, Save, Plus, Trash2, Image as ImageIcon, Sparkles, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Ingredient {
@@ -37,6 +37,11 @@ export default function NewRecipePage() {
   ]);
   const [loading, setLoading] = useState(false);
 
+  // Parse state
+  const [isPasteOpen, setIsPasteOpen] = useState(false);
+  const [pastedText, setPastedText] = useState('');
+  const [isParsing, setIsParsing] = useState(false);
+
   const ingredientsRef = useRef<HTMLDivElement>(null);
   const instructionsRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -55,6 +60,59 @@ export default function NewRecipePage() {
 
   const removeInstruction = (id: string) => {
     if (instructions.length > 1) setInstructions(instructions.filter(inst => inst.id !== id));
+  };
+
+  const handleParse = async () => {
+    if (!pastedText.trim()) return;
+    setIsParsing(true);
+    try {
+      const response = await fetch('/api/recipes/parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: pastedText }),
+      });
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to parse');
+      }
+      
+      const recipe = data.data;
+      
+      // Update state with parsed data
+      if (recipe.title) setTitle(recipe.title);
+      if (recipe.description) setDescription(recipe.description);
+      if (recipe.servings) setServings(recipe.servings.toString());
+      if (recipe.prepTime) setPrepTime(recipe.prepTime.toString());
+      if (recipe.cookTime) setCookTime(recipe.cookTime.toString());
+      
+      if (recipe.ingredients && recipe.ingredients.length > 0) {
+        setIngredients(recipe.ingredients.map((ing: any, idx: number) => ({
+          id: Date.now().toString() + idx,
+          name: ing.name,
+          amount: ing.amount ? ing.amount.toString() : '',
+          unit: ing.unit || 'יחידות',
+          scalingRule: ing.scalingRule || 'linear',
+        })));
+      }
+      
+      if (recipe.instructions && recipe.instructions.length > 0) {
+        setInstructions(recipe.instructions.map((inst: string, idx: number) => ({
+          id: Date.now().toString() + idx + 100, // Offset IDs
+          description: inst,
+        })));
+      }
+      
+      setIsPasteOpen(false);
+      toaster.create({ title: 'המתכון פוענח בהצלחה!', type: 'success' });
+      
+    } catch (error) {
+      console.error('Parse error:', error);
+      toaster.create({ title: 'שגיאה בפענוח המתכון', type: 'error' });
+    } finally {
+      setIsParsing(false);
+    }
   };
 
   const handleSave = async () => {
@@ -186,6 +244,66 @@ export default function NewRecipePage() {
       </Box>
 
       <Container maxW="4xl" mx="auto" py={10} px={4}>
+        
+        {/* Magic Import Section */}
+        <Box mb={8}>
+          {!isPasteOpen ? (
+            <Button 
+              onClick={() => setIsPasteOpen(true)}
+              variant="outline" 
+              width="full" 
+              height="auto" 
+              py={6}
+              borderStyle="dashed"
+              borderColor="purple.300"
+              color="purple.600"
+              _hover={{ bg: 'purple.50' }}
+            >
+              <Stack align="center" gap={2}>
+                <Sparkles size={24} />
+                <Text fontWeight="medium">יש לך טקסט ארוך? לחץ כאן להדבקה ובינה מלאכותית תסדר את המתכון</Text>
+              </Stack>
+            </Button>
+          ) : (
+            <Card.Root variant="elevated" borderColor="purple.200" borderWidth={1}>
+              <Card.Header display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
+                <HStack gap={2} color="purple.600">
+                  <Sparkles size={20} />
+                  <Heading size="sm">יבוא חכם באמצעות AI</Heading>
+                </HStack>
+                <IconButton 
+                  aria-label="Close" 
+                  variant="ghost" 
+                  size="xs" 
+                  onClick={() => setIsPasteOpen(false)}
+                >
+                  <X size={16} />
+                </IconButton>
+              </Card.Header>
+              <Card.Body>
+                <Textarea 
+                  placeholder="הדבק כאן את המתכון המלא (למשל: 'עוגת שוקולד: לערבב 2 כוסות קמח...')"
+                  value={pastedText}
+                  onChange={(e) => setPastedText(e.target.value)}
+                  minH="200px"
+                  mb={4}
+                  bg="white"
+                />
+                <Button 
+                  bg="purple.600"
+                  color="white"
+                  _hover={{ bg: 'purple.700' }}
+                  onClick={handleParse} 
+                  loading={isParsing}
+                  width="full"
+                >
+                 <Sparkles size={18} style={{ marginLeft: '8px' }} /> נתח וסדר את המתכון
+                </Button>
+              </Card.Body>
+            </Card.Root>
+          )}
+        </Box>
+
         <Stack gap={8}>
           
           {/* פרטים בסיסיים */}
