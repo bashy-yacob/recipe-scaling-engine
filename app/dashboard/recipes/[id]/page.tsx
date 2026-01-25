@@ -8,7 +8,16 @@ import {
 } from '@chakra-ui/react';
 import { toaster } from '@/components/ui/toaster';
 import Link from 'next/link';
-import { ArrowRight, Edit2, Trash2, Share2, Heart, Clock, Users } from 'lucide-react';
+import { ArrowRight, Edit2, Trash2, Share2, Heart, Clock, Users, Image as ImageIcon } from 'lucide-react';
+
+interface RecipeImage {
+  id: string;
+  url: string;
+  caption?: string;
+  stepNumber?: number;
+  isMain: boolean;
+  order: number;
+}
 
 interface Recipe {
   id: string;
@@ -20,6 +29,7 @@ interface Recipe {
   totalTime?: number;
   recipeIngredients: Array<{ ingredient: { name: string }; amount: number; unit: string }>;
   instructions: Array<{ description: string; stepNumber: number }>;
+  images?: RecipeImage[];
 }
 
 export default function RecipeDetailPage() {
@@ -153,6 +163,9 @@ export default function RecipeDetailPage() {
           <Tabs.List mb={6}>
             <Tabs.Trigger value="ingredients">מרכיבים</Tabs.Trigger>
             <Tabs.Trigger value="instructions">הוראות</Tabs.Trigger>
+            {recipe.images && recipe.images.length > 0 && (
+              <Tabs.Trigger value="images">תמונות ({recipe.images.length})</Tabs.Trigger>
+            )}
           </Tabs.List>
 
           <Tabs.Content value="ingredients">
@@ -209,6 +222,62 @@ export default function RecipeDetailPage() {
               </Card.Body>
             </Card.Root>
           </Tabs.Content>
+
+          {recipe.images && recipe.images.length > 0 && (
+            <Tabs.Content value="images">
+              <Card.Root variant="elevated" boxShadow="sm">
+                <Card.Header px={8} pt={8}>
+                  <Heading size="lg">תמונות ({recipe.images.length})</Heading>
+                </Card.Header>
+                <Card.Body px={8} pb={8}>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+                    {recipe.images
+                      .sort((a, b) => a.order - b.order)
+                      .map((img) => (
+                        <Box 
+                          key={img.id} 
+                          borderRadius="lg" 
+                          overflow="hidden" 
+                          boxShadow="sm"
+                          position="relative"
+                          bg="gray.100"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={img.url}
+                            alt={img.caption || 'תמונת מתכון'}
+                            style={{
+                              width: '100%',
+                              height: '250px',
+                              objectFit: 'cover',
+                            }}
+                          />
+                          {img.isMain && (
+                            <Badge 
+                              position="absolute" 
+                              top={3} 
+                              right={3}
+                              bg="orange.500" 
+                              color="white"
+                              borderRadius="full"
+                              px={3}
+                              py={1}
+                            >
+                              תמונה ראשית
+                            </Badge>
+                          )}
+                          {img.caption && (
+                            <Box p={3} bg="white">
+                              <Text fontSize="sm" color="gray.600">{img.caption}</Text>
+                            </Box>
+                          )}
+                        </Box>
+                      ))}
+                  </SimpleGrid>
+                </Card.Body>
+              </Card.Root>
+            </Tabs.Content>
+          )}
         </Tabs.Root>
       </Container>
     </Box>

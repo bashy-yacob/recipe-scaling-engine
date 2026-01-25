@@ -7,7 +7,7 @@ import {
 } from '@chakra-ui/react';
 import { toaster } from '@/components/ui/toaster';
 import Link from 'next/link';
-import { ArrowRight, Save, Plus, Trash2, Image as ImageIcon, Sparkles, X } from 'lucide-react';
+import { ArrowRight, Save, Plus, Trash2, Image as ImageIcon, Sparkles, X, Star, Link as LinkIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Ingredient {
@@ -23,6 +23,14 @@ interface Instruction {
   description: string;
 }
 
+interface RecipeImage {
+  id: string;
+  url: string;
+  caption: string;
+  stepNumber?: number;
+  isMain: boolean;
+}
+
 export default function NewRecipePage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -35,6 +43,7 @@ export default function NewRecipePage() {
   const [instructions, setInstructions] = useState<Instruction[]>([
     { id: '1', description: '' },
   ]);
+  const [images, setImages] = useState<RecipeImage[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Parse state
@@ -60,6 +69,34 @@ export default function NewRecipePage() {
 
   const removeInstruction = (id: string) => {
     if (instructions.length > 1) setInstructions(instructions.filter(inst => inst.id !== id));
+  };
+
+  const addImage = () => {
+    setImages(prev => [...prev, {
+      id: Date.now().toString(),
+      url: '',
+      caption: '',
+      isMain: prev.length === 0, // First image is main by default
+    }]);
+  };
+
+  const removeImage = (id: string) => {
+    const imageToRemove = images.find(img => img.id === id);
+    const newImages = images.filter(img => img.id !== id);
+    
+    // If removed image was main and there are other images, make first one main
+    if (imageToRemove?.isMain && newImages.length > 0) {
+      newImages[0].isMain = true;
+    }
+    
+    setImages(newImages);
+  };
+
+  const setMainImage = (id: string) => {
+    setImages(prev => prev.map(img => ({
+      ...img,
+      isMain: img.id === id,
+    })));
   };
 
   const handleParse = async () => {
@@ -155,6 +192,15 @@ export default function NewRecipePage() {
             .map((inst, idx) => ({
               content: inst.description,
               order: idx,
+            })),
+          images: images
+            .filter(img => img.url.trim())
+            .map((img, idx) => ({
+              url: img.url,
+              caption: img.caption,
+              stepNumber: img.stepNumber,
+              order: idx,
+              isMain: img.isMain,
             })),
         }),
       });
@@ -386,23 +432,102 @@ export default function NewRecipePage() {
                     />
                   </Field.Root>
                 </SimpleGrid>
-
-                {/* תמונה (החלק שהיה חסר) */}
-                <Field.Root>
-                  <Field.Label fontWeight="bold">תמונת המתכון</Field.Label>
-                  <Box
-                    border="2px dashed" borderColor="gray.200" borderRadius="lg" p={10}
-                    textAlign="center" bg="gray.50" cursor="pointer"
-                    _hover={{ bg: 'orange.50', borderColor: 'orange.200' }}
-                  >
-                    <Stack gap={2} align="center">
-                      <ImageIcon size={40} color="gray" />
-                      <Text fontWeight="medium">לחצי להעלאת תמונה</Text>
-                      <Text fontSize="xs" color="gray.500">JPG, PNG עד 5MB</Text>
-                    </Stack>
-                  </Box>
-                </Field.Root>
               </Stack>
+            </Card.Body>
+          </Card.Root>
+
+          {/* תמונות מתכון */}
+          <Card.Root variant="elevated" boxShadow="sm" borderRadius="xl">
+            <Card.Header px={8} pt={8} borderBottomWidth="1px" pb={4} mb={4}>
+              <HStack justify="space-between">
+                <Stack gap={0}>
+                  <Heading size="md">תמונות</Heading>
+                  <Text fontSize="sm" color="gray.500">הוסיפי תמונות של שלבי ההכנה או התוצאה הסופית</Text>
+                </Stack>
+                <Button size="sm" variant="outline" colorPalette="orange" onClick={addImage}>
+                  <Plus size={16} /> הוסף תמונה
+                </Button>
+              </HStack>
+            </Card.Header>
+            <Card.Body px={8} pb={8}>
+              {images.length === 0 ? (
+                <Box
+                  border="2px dashed" borderColor="gray.200" borderRadius="lg" p={10}
+                  textAlign="center" bg="gray.50" cursor="pointer"
+                  _hover={{ bg: 'orange.50', borderColor: 'orange.200' }}
+                  onClick={addImage}
+                >
+                  <Stack gap={2} align="center">
+                    <ImageIcon size={40} color="gray" />
+                    <Text fontWeight="medium">לחצי להוספת תמונות</Text>
+                    <Text fontSize="xs" color="gray.500">ניתן להוסיף מספר תמונות לשלבי ההכנה</Text>
+                  </Stack>
+                </Box>
+              ) : (
+                <Stack gap={4}>
+                  {images.map((img, idx) => (
+                    <Card.Root key={img.id} variant="outline" size="sm">
+                      <Card.Body p={4}>
+                        <Grid templateColumns={{ base: "1fr", md: "1fr 2fr auto" }} gap={4} alignItems="center">
+                          <HStack gap={3}>
+                            <Badge 
+                              bg={img.isMain ? "orange.500" : "gray.200"} 
+                              color={img.isMain ? "white" : "gray.600"} 
+                              borderRadius="full" 
+                              px={3} 
+                              py={1}
+                              cursor="pointer"
+                              onClick={() => setMainImage(img.id)}
+                              title={img.isMain ? "תמונה ראשית" : "לחץ להגדרה כתמונה ראשית"}
+                            >
+                              <Star size={12} style={{ marginLeft: '4px' }} />
+                              {img.isMain ? "ראשית" : `${idx + 1}`}
+                            </Badge>
+                            <Input
+                              placeholder="כתובת URL של תמונה"
+                              value={img.url}
+                              onChange={(e) => {
+                                const newImages = [...images];
+                                newImages[idx].url = e.target.value;
+                                setImages(newImages);
+                              }}
+                              size="sm"
+                            />
+                          </HStack>
+                          <Input
+                            placeholder="תיאור (אופציונלי) - לדוגמה: לאחר ערבוב הבצק"
+                            value={img.caption}
+                            onChange={(e) => {
+                              const newImages = [...images];
+                              newImages[idx].caption = e.target.value;
+                              setImages(newImages);
+                            }}
+                            size="sm"
+                          />
+                          <IconButton 
+                            variant="ghost" 
+                            colorPalette="red" 
+                            onClick={() => removeImage(img.id)}
+                            size="sm"
+                            aria-label="מחק תמונה"
+                          >
+                            <Trash2 size={16} />
+                          </IconButton>
+                        </Grid>
+                      </Card.Body>
+                    </Card.Root>
+                  ))}
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    colorPalette="orange" 
+                    onClick={addImage}
+                    alignSelf="start"
+                  >
+                    <Plus size={16} /> הוסף תמונה נוספת
+                  </Button>
+                </Stack>
+              )}
             </Card.Body>
           </Card.Root>
 

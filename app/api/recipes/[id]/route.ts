@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db';
 import { getRecipeById } from '@/lib/recipes/read';
-import { updateRecipe, updateRecipeIngredients, updateRecipeInstructions } from '@/lib/recipes/update';
+import { updateRecipe, updateRecipeIngredients, updateRecipeInstructions, updateRecipeImages } from '@/lib/recipes/update';
 import { deleteRecipe } from '@/lib/recipes/delete';
 import { auth } from '@/lib/auth';
 
@@ -64,6 +64,11 @@ export async function PUT(
     // Update instructions if provided
     if (body.instructions && Array.isArray(body.instructions)) {
       recipe = await updateRecipeInstructions(id, body.instructions);
+    }
+
+    // Update images if provided
+    if (body.images && Array.isArray(body.images)) {
+      recipe = await updateRecipeImages(id, body.images);
     }
 
     return Response.json(recipe);

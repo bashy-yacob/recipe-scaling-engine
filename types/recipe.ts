@@ -14,6 +14,15 @@ export interface Instruction {
   order: number;
 }
 
+export interface RecipeImage {
+  id: string;
+  url: string;
+  caption?: string;
+  stepNumber?: number; // If linked to a specific instruction step
+  order: number;
+  isMain: boolean;
+}
+
 export interface Recipe {
   id: string;
   userId: string;
@@ -21,6 +30,7 @@ export interface Recipe {
   servings: number;
   ingredients: Ingredient[];
   instructions: Instruction[];
+  images?: RecipeImage[];
   cookTime: number;
   prepTime: number;
   isPublic?: boolean;

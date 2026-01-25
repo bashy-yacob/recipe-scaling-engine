@@ -32,6 +32,7 @@ model User {
   recipes  Recipe[]
   accounts Account[]
   sessions Session[]
+  likes    RecipeLike[]
 
   @@map("users")
 }
@@ -89,6 +90,8 @@ model Recipe {
   prepTime    Int? // minutes
   cookTime    Int? // minutes
   totalTime   Int? // minutes
+  difficulty  String?  // easy, medium, hard
+  category    String?  // main, dessert, appetizer, etc.
   
   // Metadata
   source      String? // URL or book name
@@ -110,9 +113,31 @@ model Recipe {
   tags                RecipeTag[]
   bakingParameters    BakingParameters?
   versions            RecipeVersion[]
+  likes               RecipeLike[]
+  images              RecipeImage[]
 
   @@index([userId])
   @@map("recipes")
+}
+
+// ============================================
+// LIKES
+// ============================================
+
+model RecipeLike {
+  id        String   @id @default(cuid())
+  userId    String
+  recipeId  String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId])
+  @@index([recipeId])
+  @@index([userId])
+  @@map("recipe_likes")
 }
 
 // ============================================
@@ -219,6 +244,27 @@ model BakingParameters {
   recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   @@map("baking_parameters")
+}
+
+// ============================================
+// RECIPE IMAGES
+// ============================================
+
+model RecipeImage {
+  id          String   @id @default(cuid())
+  recipeId    String
+  url         String   // URL of the image
+  caption     String?  // Optional caption/description
+  stepNumber  Int?     // If linked to a specific instruction step
+  order       Int      @default(0) // For sorting images
+  isMain      Boolean  @default(false) // Mark as main/cover image
+  createdAt   DateTime @default(now())
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([recipeId])
+  @@map("recipe_images")
 }
 
 // ============================================

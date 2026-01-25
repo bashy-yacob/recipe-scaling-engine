@@ -15,10 +15,12 @@ import {
   Center,
   Spinner,
   Tabs,
+  Select,
+  createListCollection,
 } from '@chakra-ui/react';
 import Link from 'next/link';
-import { Plus, Search, ChefHat, Sparkles, Heart, Tag, BookOpen, Link as LinkIcon, Image as ImageIcon, Clock, Users, AlertTriangle, Globe, Lock, Eye } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Plus, Search, ChefHat, Sparkles, Heart, Tag, BookOpen, Link as LinkIcon, Image as ImageIcon, Clock, Users, AlertTriangle, Globe, Lock, Eye, Filter, ArrowUpDown, X } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { toaster } from '@/components/ui/toaster';
@@ -30,38 +32,113 @@ interface Recipe {
   servings: number;
   prepTime?: number;
   cookTime?: number;
+  difficulty?: string;
+  category?: string;
   isComplete?: boolean;
   isPublic?: boolean;
   userId: string;
+  likeCount: number;
+  isLiked: boolean;
+  user?: { id: string; name?: string };
   recipeIngredients: Array<{ ingredient: { name: string } }>;
   instructions: Array<{ content: string }>;
 }
+
+// Sort options
+const sortOptions = createListCollection({
+  items: [
+    { label: 'תאריך יצירה (חדש → ישן)', value: 'createdAt-desc' },
+    { label: 'תאריך יצירה (ישן → חדש)', value: 'createdAt-asc' },
+    { label: 'שם (א-ת)', value: 'title-asc' },
+    { label: 'שם (ת-א)', value: 'title-desc' },
+    { label: 'זמן הכנה (קצר → ארוך)', value: 'prepTime-asc' },
+    { label: 'זמן הכנה (ארוך → קצר)', value: 'prepTime-desc' },
+    { label: 'מנות (פחות → יותר)', value: 'servings-asc' },
+    { label: 'מנות (יותר → פחות)', value: 'servings-desc' },
+    { label: 'לייקים (הכי פופולרי)', value: 'likes-desc' },
+    { label: 'לייקים (הכי פחות)', value: 'likes-asc' },
+  ],
+});
+
+const difficultyOptions = createListCollection({
+  items: [
+    { label: 'כל הרמות', value: '' },
+    { label: '🟢 קל', value: 'easy' },
+    { label: '🟡 בינוני', value: 'medium' },
+    { label: '🔴 קשה', value: 'hard' },
+  ],
+});
+
+const categoryOptions = createListCollection({
+  items: [
+    { label: 'כל הקטגוריות', value: '' },
+    { label: '🍽️ מנה עיקרית', value: 'main' },
+    { label: '🍰 קינוח', value: 'dessert' },
+    { label: '🥗 מנה ראשונה', value: 'appetizer' },
+    { label: '🥣 מרק', value: 'soup' },
+    { label: '🥪 ארוחת בוקר', value: 'breakfast' },
+    { label: '🍞 לחם ומאפים', value: 'bread' },
+    { label: '🥤 משקאות', value: 'drinks' },
+  ],
+});
+
+const timeOptions = createListCollection({
+  items: [
+    { label: 'ללא הגבלה', value: '' },
+    { label: 'עד 15 דקות', value: '15' },
+    { label: 'עד 30 דקות', value: '30' },
+    { label: 'עד 45 דקות', value: '45' },
+    { label: 'עד שעה', value: '60' },
+    { label: 'עד שעתיים', value: '120' },
+  ],
+});
 
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'mine' | 'public'>('mine');
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Filter & Sort state
+  const [sortBy, setSortBy] = useState('createdAt-desc');
+  const [difficulty, setDifficulty] = useState('');
+  const [category, setCategory] = useState('');
+  const [maxPrepTime, setMaxPrepTime] = useState('');
+  const [maxCookTime, setMaxCookTime] = useState('');
+  
   const router = useRouter();
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
 
-  useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
-        const response = await fetch('/api/recipes');
-        if (!response.ok) throw new Error('Failed to fetch');
-        const data = await response.json();
-        setRecipes(data);
-      } catch (error) {
-        console.error('Error fetching recipes:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchRecipes = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [sortField, sortOrder] = sortBy.split('-');
+      const params = new URLSearchParams();
+      
+      params.set('sortBy', sortField);
+      params.set('sortOrder', sortOrder);
+      if (difficulty) params.set('difficulty', difficulty);
+      if (category) params.set('category', category);
+      if (maxPrepTime) params.set('maxPrepTime', maxPrepTime);
+      if (maxCookTime) params.set('maxCookTime', maxCookTime);
+      if (searchQuery) params.set('search', searchQuery);
+      
+      const response = await fetch(`/api/recipes?${params.toString()}`);
+      if (!response.ok) throw new Error('Failed to fetch');
+      const data = await response.json();
+      setRecipes(data);
+    } catch (error) {
+      console.error('Error fetching recipes:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [sortBy, difficulty, category, maxPrepTime, maxCookTime, searchQuery]);
 
+  useEffect(() => {
     fetchRecipes();
-  }, []);
+  }, [fetchRecipes]);
 
   const togglePublish = async (e: React.MouseEvent, recipeId: string, currentlyPublic: boolean) => {
     e.preventDefault();
@@ -89,14 +166,51 @@ export default function RecipesPage() {
     }
   };
 
-  // Filter recipes by search
-  const searchFiltered = recipes.filter(recipe =>
-    recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const toggleLike = async (e: React.MouseEvent, recipeId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!currentUserId) {
+      toaster.error({ title: 'יש להתחבר כדי לסמן לייק' });
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/recipes/${recipeId}/like`, {
+        method: 'POST',
+      });
+      
+      if (!response.ok) throw new Error('Failed to toggle like');
+      
+      const data = await response.json();
+      
+      setRecipes(prev => prev.map(r => 
+        r.id === recipeId 
+          ? { ...r, isLiked: data.liked, likeCount: data.likeCount } 
+          : r
+      ));
+      
+      toaster.success({
+        title: data.liked ? '❤️ נוסף למועדפים!' : '💔 הוסר מהמועדפים',
+      });
+    } catch (error) {
+      toaster.error({ title: 'שגיאה בעדכון הלייק' });
+    }
+  };
+
+  const clearFilters = () => {
+    setDifficulty('');
+    setCategory('');
+    setMaxPrepTime('');
+    setMaxCookTime('');
+    setSortBy('createdAt-desc');
+  };
+
+  const hasActiveFilters = difficulty || category || maxPrepTime || maxCookTime;
 
   // Split into my recipes and public recipes
-  const myRecipes = searchFiltered.filter(r => r.userId === currentUserId);
-  const publicRecipes = searchFiltered.filter(r => r.isPublic && r.userId !== currentUserId);
+  const myRecipes = recipes.filter(r => r.userId === currentUserId);
+  const publicRecipes = recipes.filter(r => r.isPublic);
 
   const displayedRecipes = activeTab === 'mine' ? myRecipes : publicRecipes;
 
@@ -137,7 +251,7 @@ export default function RecipesPage() {
             {/* שורת חיפוש */}
             <Box position="relative" w="full" maxW="3xl" mx="auto"> 
               <Input
-                placeholder="חפשי מתכון לפי שם, מרכיב או תגית..."
+                placeholder="חפשי מתכון לפי שם או תיאור..."
                 size="xl"
                 bg="gray.50"
                 h="60px"
@@ -147,6 +261,7 @@ export default function RecipesPage() {
                 borderWidth="2px"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && fetchRecipes()}
                 _focus={{ borderColor: 'orange.400', bg: 'white', boxShadow: '0 4px 20px rgba(249, 115, 22, 0.1)' }}
               />
               <Box
@@ -191,6 +306,168 @@ export default function RecipesPage() {
                 </Button>
               </HStack>
             </Center>
+
+            {/* כפתור פילטרים */}
+            <Center>
+              <HStack gap={3}>
+                <Button
+                  onClick={() => setShowFilters(!showFilters)}
+                  variant={showFilters ? 'solid' : 'outline'}
+                  bg={showFilters ? 'orange.500' : 'white'}
+                  color={showFilters ? 'white' : 'gray.700'}
+                  _hover={{ bg: showFilters ? 'orange.600' : 'gray.100' }}
+                  borderRadius="xl"
+                  px={5}
+                >
+                  <Filter size={18} style={{ marginLeft: '8px' }} />
+                  סינון ומיון
+                  {hasActiveFilters && (
+                    <Badge bg="red.500" color="white" borderRadius="full" mr={2} fontSize="xs">!</Badge>
+                  )}
+                </Button>
+                {hasActiveFilters && (
+                  <Button
+                    onClick={clearFilters}
+                    variant="ghost"
+                    color="red.500"
+                    size="sm"
+                    _hover={{ bg: 'red.50' }}
+                  >
+                    <X size={16} style={{ marginLeft: '4px' }} />
+                    נקה פילטרים
+                  </Button>
+                )}
+              </HStack>
+            </Center>
+
+            {/* פאנל פילטרים */}
+            {showFilters && (
+              <Box 
+                bg="white" 
+                p={6} 
+                borderRadius="2xl" 
+                boxShadow="md"
+                border="1px solid"
+                borderColor="gray.200"
+              >
+                <Stack gap={5}>
+                  {/* מיון */}
+                  <Box>
+                    <Text fontWeight="bold" color="gray.700" mb={2} fontSize="sm">
+                      <ArrowUpDown size={16} style={{ display: 'inline', marginLeft: '6px' }} />
+                      מיון לפי
+                    </Text>
+                    <Select.Root
+                      collection={sortOptions}
+                      value={[sortBy]}
+                      onValueChange={(e) => setSortBy(e.value[0])}
+                      size="md"
+                    >
+                      <Select.Trigger bg="gray.50" borderRadius="xl">
+                        <Select.ValueText placeholder="בחרי מיון" />
+                      </Select.Trigger>
+                      <Select.Content>
+                        {sortOptions.items.map((option) => (
+                          <Select.Item key={option.value} item={option}>
+                            {option.label}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Root>
+                  </Box>
+
+                  <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={4}>
+                    {/* רמת קושי */}
+                    <Box>
+                      <Text fontWeight="medium" color="gray.600" mb={2} fontSize="sm">רמת קושי</Text>
+                      <Select.Root
+                        collection={difficultyOptions}
+                        value={[difficulty]}
+                        onValueChange={(e) => setDifficulty(e.value[0])}
+                        size="sm"
+                      >
+                        <Select.Trigger bg="gray.50" borderRadius="lg">
+                          <Select.ValueText placeholder="כל הרמות" />
+                        </Select.Trigger>
+                        <Select.Content>
+                          {difficultyOptions.items.map((option) => (
+                            <Select.Item key={option.value} item={option}>
+                              {option.label}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Root>
+                    </Box>
+
+                    {/* קטגוריה */}
+                    <Box>
+                      <Text fontWeight="medium" color="gray.600" mb={2} fontSize="sm">קטגוריה</Text>
+                      <Select.Root
+                        collection={categoryOptions}
+                        value={[category]}
+                        onValueChange={(e) => setCategory(e.value[0])}
+                        size="sm"
+                      >
+                        <Select.Trigger bg="gray.50" borderRadius="lg">
+                          <Select.ValueText placeholder="כל הקטגוריות" />
+                        </Select.Trigger>
+                        <Select.Content>
+                          {categoryOptions.items.map((option) => (
+                            <Select.Item key={option.value} item={option}>
+                              {option.label}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Root>
+                    </Box>
+
+                    {/* זמן הכנה מקסימלי */}
+                    <Box>
+                      <Text fontWeight="medium" color="gray.600" mb={2} fontSize="sm">זמן הכנה מקס&apos;</Text>
+                      <Select.Root
+                        collection={timeOptions}
+                        value={[maxPrepTime]}
+                        onValueChange={(e) => setMaxPrepTime(e.value[0])}
+                        size="sm"
+                      >
+                        <Select.Trigger bg="gray.50" borderRadius="lg">
+                          <Select.ValueText placeholder="ללא הגבלה" />
+                        </Select.Trigger>
+                        <Select.Content>
+                          {timeOptions.items.map((option) => (
+                            <Select.Item key={option.value} item={option}>
+                              {option.label}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Root>
+                    </Box>
+
+                    {/* זמן בישול מקסימלי */}
+                    <Box>
+                      <Text fontWeight="medium" color="gray.600" mb={2} fontSize="sm">זמן בישול מקס&apos;</Text>
+                      <Select.Root
+                        collection={timeOptions}
+                        value={[maxCookTime]}
+                        onValueChange={(e) => setMaxCookTime(e.value[0])}
+                        size="sm"
+                      >
+                        <Select.Trigger bg="gray.50" borderRadius="lg">
+                          <Select.ValueText placeholder="ללא הגבלה" />
+                        </Select.Trigger>
+                        <Select.Content>
+                          {timeOptions.items.map((option) => (
+                            <Select.Item key={option.value} item={option}>
+                              {option.label}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Root>
+                    </Box>
+                  </SimpleGrid>
+                </Stack>
+              </Box>
+            )}
           </Stack>
         </Container>
       </Box>
@@ -211,45 +488,44 @@ export default function RecipesPage() {
               <Box key={recipe.id} position="relative">
                 <Link href={`/dashboard/recipes/${recipe.id}`} style={{ textDecoration: 'none' }}>
                   <Card.Root 
-                    variant="outline" 
-                    bg="white" 
-                    borderRadius="2xl"
-                    overflow="hidden"
-                    transition="all 0.3s ease"
-                    _hover={{
-                      boxShadow: 'lg',
-                      transform: 'translateY(-4px)',
-                      borderColor: 'orange.300'
-                    }}
+                    overflow="hidden" 
+                    borderRadius="3xl" 
+                    boxShadow="xl" 
+                    border="none" 
+                    transition="all 0.3s" 
+                    _hover={{ transform: 'translateY(-8px)' }}
                     h="full"
+                    bg="white"
                   >
-                    <Card.Body p={6}>
-                      <Stack gap={4} h="full">
-                        <Stack gap={2}>
-                          <HStack justify="space-between" align="start">
-                            <Heading size="md" color="gray.800" lineClamp={2}>
-                              {recipe.title}
-                            </Heading>
-                            <HStack gap={1} flexShrink={0}>
-                              {recipe.isPublic ? (
-                                <Badge bg="green.100" color="green.700" fontSize="xs" px={2} py={1} borderRadius="md">
-                                  <Globe size={12} style={{ marginLeft: '4px' }} />
-                                  ציבורי
-                                </Badge>
-                              ) : (
-                                <Badge bg="gray.100" color="gray.600" fontSize="xs" px={2} py={1} borderRadius="md">
-                                  <Lock size={12} style={{ marginLeft: '4px' }} />
-                                  פרטי
-                                </Badge>
-                              )}
-                              {recipe.isComplete === false && (
+                    <Box h="200px" bgGradient="to-br" gradientFrom="orange.400" gradientTo="yellow.400" position="relative">
+                      <Center h="full">
+                        <ChefHat size={60} color="white" opacity={0.3} />
+                      </Center>
+                      <HStack position="absolute" top={4} right={4} gap={2}>
+                        {recipe.difficulty && (
+                            <Badge 
+                                bg="white" color={recipe.difficulty === 'easy' ? 'green.600' : recipe.difficulty === 'medium' ? 'yellow.600' : 'red.600'} 
+                                borderRadius="lg" px={3} py={1} boxShadow="sm"
+                            >
+                                {recipe.difficulty === 'easy' ? 'קל להכנה' : recipe.difficulty === 'medium' ? 'בינוני' : 'למתקדמים'}
+                            </Badge>
+                        )}
+                        {recipe.isPublic ? (
+                            <Badge bg="white" color="green.700" borderRadius="lg" px={3} py={1} boxShadow="sm">
+                                <Globe size={12} style={{ marginLeft: '4px', display: 'inline' }} />
+                                ציבורי
+                            </Badge>
+                        ) : (
+                             <Badge bg="white" color="gray.600" borderRadius="lg" px={3} py={1} boxShadow="sm">
+                                <Lock size={12} style={{ marginLeft: '4px', display: 'inline' }} />
+                                פרטי
+                            </Badge>
+                        )}
+                         {recipe.isComplete === false && (
                                 <Badge 
-                                  bg="yellow.100" 
-                                  color="yellow.700" 
-                                  fontSize="xs"
-                                  px={2}
-                                  py={1}
-                                  borderRadius="md"
+                                  bg="white" 
+                                  color="red.600" 
+                                  borderRadius="lg" px={3} py={1} boxShadow="sm"
                                   display="flex"
                                   alignItems="center"
                                   gap={1}
@@ -257,50 +533,88 @@ export default function RecipesPage() {
                                   <AlertTriangle size={12} />
                                   לא מושלם
                                 </Badge>
-                              )}
-                            </HStack>
-                          </HStack>
-                          {recipe.description && (
-                            <Text color="gray.500" fontSize="sm" lineClamp={2}>
-                              {recipe.description}
-                            </Text>
-                          )}
-                        </Stack>
+                        )}
+                      </HStack>
+                    </Box>
 
-                        <HStack gap={4} fontSize="sm" color="gray.600">
-                          <HStack gap={1}>
-                            <Users size={16} />
-                            <Text>{recipe.servings} מנות</Text>
+                    <Card.Body p={6}>
+                      <Stack gap={4} h="full">
+                        <HStack justify="space-between" align="start">
+                          <Heading size="md" fontWeight="bold" lineClamp={2} color="gray.800">
+                             {recipe.title}
+                          </Heading>
+                          <HStack gap={1} bg="red.50" px={2} py={1} borderRadius="md" color={recipe.isLiked ? 'red.500' : 'gray.400'}>
+                             <Heart size={14} fill={recipe.isLiked ? 'currentColor' : 'none'} />
+                             <Text fontWeight="bold" fontSize="xs" color="red.700">{recipe.likeCount}</Text>
                           </HStack>
-                          {recipe.cookTime && (
-                            <HStack gap={1}>
-                              <Clock size={16} />
-                              <Text>{recipe.cookTime} דקות</Text>
-                            </HStack>
-                          )}
                         </HStack>
-
-                        <Stack gap={2} mt="auto">
-                          <Text color="gray.500" fontSize="xs">
-                            {recipe.recipeIngredients.length} מרכיבים
+                        
+                        {recipe.description && (
+                          <Text fontSize="sm" color="gray.500" lineClamp={2}>
+                             {recipe.description}
                           </Text>
-                          <HStack gap={2} flexWrap="wrap">
-                            {recipe.recipeIngredients.slice(0, 3).map((ing, idx) => (
-                              <Badge key={idx} bg="orange.50" color="orange.600" fontSize="xs">
-                                {ing.ingredient.name}
-                              </Badge>
-                            ))}
-                            {recipe.recipeIngredients.length > 3 && (
-                              <Badge bg="gray.100" color="gray.600" fontSize="xs">
-                                +{recipe.recipeIngredients.length - 3} עוד
-                              </Badge>
-                            )}
+                        )}
+
+                        <HStack gap={2} flexWrap="wrap">
+                       {/* Category */}
+                       {recipe.category && (
+                            <Badge bg="purple.50" color="purple.700" borderRadius="md" px={2}>
+                                 {recipe.category === 'main' ? '🍽️ מנה עיקרית' :
+                                  recipe.category === 'dessert' ? '🍰 קינוח' :
+                                  recipe.category === 'appetizer' ? '🥗 מנה ראשונה' :
+                                  recipe.category === 'soup' ? '🥣 מרק' :
+                                  recipe.category === 'breakfast' ? '🥪 ארוחת בוקר' :
+                                  recipe.category === 'bread' ? '🍞 לחם' :
+                                  recipe.category === 'drinks' ? '🥤 משקה' : recipe.category}
+                            </Badge>
+                       )}
+                       </HStack>
+
+                        <HStack gap={4} pt={2} mt="auto" borderTopWidth="1px" borderColor="gray.100">
+                          {(recipe.prepTime || recipe.cookTime) && (
+                            <HStack gap={1} color="gray.400">
+                                <Clock size={16} />
+                                <Text fontSize="xs">{(recipe.prepTime || 0) + (recipe.cookTime || 0)} דק'</Text>
+                            </HStack>
+                          )}
+                          <HStack gap={1} color="gray.400">
+                             <Users size={16} />
+                             <Text fontSize="xs">{recipe.servings} מנות</Text>
                           </HStack>
-                        </Stack>
+                           
+                           {/* Ingredients summary */}
+                           <Text fontSize="xs" color="gray.300" mr="auto">
+                              {recipe.recipeIngredients.length} מרכיבים
+                           </Text>
+                        </HStack>
                       </Stack>
                     </Card.Body>
                   </Card.Root>
                 </Link>
+                
+                {/* Like button - for public recipes */}
+                {(recipe.isPublic || recipe.userId !== currentUserId) && (
+                  <Button
+                    position="absolute"
+                    bottom={3}
+                    left={3}
+                    size="sm"
+                    variant="ghost"
+                    bg={recipe.isLiked ? 'red.50' : 'white'}
+                    color={recipe.isLiked ? 'red.500' : 'gray.500'}
+                    _hover={{ 
+                      bg: recipe.isLiked ? 'red.100' : 'gray.100',
+                      transform: 'scale(1.1)'
+                    }}
+                    borderRadius="full"
+                    boxShadow="md"
+                    p={2}
+                    minW="auto"
+                    onClick={(e) => toggleLike(e, recipe.id)}
+                  >
+                    <Heart size={18} fill={recipe.isLiked ? 'currentColor' : 'none'} />
+                  </Button>
+                )}
                 
                 {/* Publish/Unpublish button - only for owner */}
                 {recipe.userId === currentUserId && (

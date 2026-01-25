@@ -1,5 +1,5 @@
 # 📊 סטטוס פרויקט Recipe Scaling Engine
-**עדכון אחרון: 25 ינואר 2026, 22:30** | **סטטוס: 🚀 באוויר בפרודקשן!**
+**עדכון אחרון: 25 ינואר 2026, 23:30** | **סטטוס: 🚀 באוויר בפרודקשן!**
 
 ---
 
@@ -36,6 +36,9 @@
 | 🔒 **מתכונים פרטיים** | ✅ | isPublic - מתכונים אישיים לכל משתמש |
 | 🌍 **מתכונים ציבוריים** | ✅ | שיתוף מתכונים עם הקהילה |
 | 📂 **טאבים מתכונים** | ✅ | "המתכונים שלי" / "מתכונים ציבוריים" |
+| ❤️ **מערכת לייקים** | ✅ | סימון מתכונים מועדפים |
+| 🔍 **סינון מתכונים** | ✅ | לפי קושי, קטגוריה, זמן הכנה |
+| 📊 **מיון מתכונים** | ✅ | תאריך, שם, זמן, מנות, לייקים |
 
 ### 📈 אחוז השלמה: **100%** ✅
 
@@ -68,10 +71,10 @@
 ## ✅ תוצאות Build אחרון
 
 ```
-✓ Compiled successfully in 16.2s (Turbopack)
-✓ TypeScript check passed in 27.9s
+✓ Compiled successfully in 11.0s (Turbopack)
+✓ TypeScript check passed in 25.0s
 ✓ 15 static pages generated
-✓ 6 dynamic API routes
+✓ 7 dynamic API routes
 
 ⚠ Note: "middleware" file convention is deprecated, use "proxy" instead
 ```
@@ -91,6 +94,7 @@
 | `/demo` | Static | דף הדגמה |
 | `/api/recipes` | Dynamic | GET/POST recipes |
 | `/api/recipes/[id]` | Dynamic | GET/PUT/DELETE recipe |
+| `/api/recipes/[id]/like` | Dynamic | GET/POST likes |
 | `/api/recipes/parse` | Dynamic | AI parsing (Groq) |
 | `/api/auth/[...nextauth]` | Dynamic | Auth handlers |
 | `/api/auth/register` | Dynamic | הרשמה API |
@@ -108,8 +112,9 @@ recipe-scaling-engine/
 │   │   │   ├── [...nextauth]/route.ts  # NextAuth handlers
 │   │   │   └── register/route.ts       # הרשמה (60 שורות)
 │   │   ├── recipes/
-│   │   │   ├── route.ts                # GET/POST (45 שורות)
+│   │   │   ├── route.ts                # GET/POST + סינון/מיון (95 שורות)
 │   │   │   ├── [id]/route.ts           # GET/PUT/DELETE (70 שורות)
+│   │   │   ├── [id]/like/route.ts      # GET/POST likes (95 שורות)
 │   │   │   └── parse/route.ts          # AI parsing (83 שורות)
 │   │   └── user/settings/route.ts      # GET/PUT (90 שורות)
 │   ├── auth/
@@ -300,6 +305,16 @@ Response: {
 - [x] תגיות סטטוס: 🌍 ציבורי / 🔒 פרטי
 - [x] הודעות Toast בעת שינוי סטטוס
 
+### ✅ הושלם - סינון, מיון ולייקים (חדש! 25/01/26)
+- [x] מודל `RecipeLike` ב-Prisma (many-to-many)
+- [x] שדות `difficulty` ו-`category` במודל Recipe
+- [x] API לסינון לפי: רמת קושי, קטגוריה, זמן הכנה/בישול
+- [x] API למיון לפי: תאריך, שם, זמן, מנות, לייקים
+- [x] `GET/POST /api/recipes/[id]/like` - מערכת לייקים
+- [x] UI פאנל סינון ומיון מתקדם
+- [x] כפתור לייק בכל כרטיס מתכון ציבורי
+- [x] הצגת מספר לייקים וסימון ❤️ למועדפים
+
 ### ✅ הושלם - UI Pages
 - [x] `/dashboard/recipes` - רשימה + חיפוש
 - [x] `/dashboard/recipes/[id]` - צפייה + scaling
@@ -311,8 +326,9 @@ Response: {
 - [x] Error boundaries
 
 ### ✅ הושלם - API Routes
-- [x] `GET/POST /api/recipes`
+- [x] `GET/POST /api/recipes` (עם סינון ומיון)
 - [x] `GET/PUT/DELETE /api/recipes/[id]`
+- [x] `GET/POST /api/recipes/[id]/like` (לייקים)
 - [x] `POST /api/recipes/parse` (AI)
 - [x] `POST /api/auth/register`
 - [x] `GET/PUT /api/user/settings`
@@ -367,6 +383,6 @@ npx vercel --prod
 
 **סטטוס: ✅ הפרויקט מוכן לפרודקשן!**
 
-**עדכון אחרון: 25 ינואר 2026, 22:30**
+**עדכון אחרון: 25 ינואר 2026, 23:30**
 
-**כולל:** Authentication מלא, Error Boundaries, Settings Page, Protected Routes, AI Recipe Parsing (Groq), מתכונים פרטיים/ציבוריים עם כפתור פרסום
+**כולל:** Authentication מלא, Error Boundaries, Settings Page, Protected Routes, AI Recipe Parsing (Groq), מתכונים פרטיים/ציבוריים, מערכת לייקים, סינון ומיון מתקדם

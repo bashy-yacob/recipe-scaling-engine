@@ -20,6 +20,11 @@ export async function getUserRecipes(userId: string) {
             stepNumber: 'asc',
           },
         },
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
         user: true,
       },
       orderBy: {
@@ -56,6 +61,11 @@ export async function getRecipeById(recipeId: string, viewerId?: string) {
         instructions: {
           orderBy: {
             stepNumber: 'asc',
+          },
+        },
+        images: {
+          orderBy: {
+            order: 'asc',
           },
         },
         user: true,
@@ -96,6 +106,11 @@ export async function getRecipesByTag(userId: string, tagName: string) {
         instructions: {
           orderBy: {
             stepNumber: 'asc',
+          },
+        },
+        images: {
+          orderBy: {
+            order: 'asc',
           },
         },
         user: true,
@@ -140,6 +155,11 @@ export async function searchRecipes(userId: string, query: string) {
         instructions: {
           orderBy: {
             stepNumber: 'asc',
+          },
+        },
+        images: {
+          orderBy: {
+            order: 'asc',
           },
         },
         user: true,

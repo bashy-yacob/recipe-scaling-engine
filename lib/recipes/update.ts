@@ -59,6 +59,11 @@ export async function updateRecipe(recipeId: string, input: UpdateRecipeInput) {
             stepNumber: 'asc',
           },
         },
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
     });
 
@@ -130,6 +135,11 @@ export async function updateRecipeIngredients(
             stepNumber: 'asc',
           },
         },
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
     });
 
@@ -178,12 +188,140 @@ export async function updateRecipeInstructions(
             stepNumber: 'asc',
           },
         },
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
     });
 
     return updatedRecipe;
   } catch (error) {
     console.error('Error updating recipe instructions:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update recipe images
+ */
+export async function updateRecipeImages(
+  recipeId: string,
+  images: Array<{
+    url: string;
+    caption?: string;
+    stepNumber?: number;
+    order: number;
+    isMain?: boolean;
+  }>
+) {
+  try {
+    // Delete existing images
+    await db.recipeImage.deleteMany({
+      where: { recipeId },
+    });
+
+    // Create new images
+    const updatedRecipe = await db.recipe.update({
+      where: { id: recipeId },
+      data: {
+        images: {
+          create: images.map((img) => ({
+            url: img.url,
+            caption: img.caption,
+            stepNumber: img.stepNumber,
+            order: img.order,
+            isMain: img.isMain ?? false,
+          })),
+        },
+      },
+      include: {
+        recipeIngredients: {
+          include: {
+            ingredient: true,
+          },
+        },
+        instructions: {
+          orderBy: {
+            stepNumber: 'asc',
+          },
+        },
+        images: {
+          orderBy: {
+            order: 'asc',
+          },
+        },
+      },
+    });
+
+    return updatedRecipe;
+  } catch (error) {
+    console.error('Error updating recipe images:', error);
+    throw error;
+  }
+}
+
+/**
+ * Add a single image to a recipe
+ */
+export async function addRecipeImage(
+  recipeId: string,
+  image: {
+    url: string;
+    caption?: string;
+    stepNumber?: number;
+    isMain?: boolean;
+  }
+) {
+  try {
+    // Get the current highest order
+    const lastImage = await db.recipeImage.findFirst({
+      where: { recipeId },
+      orderBy: { order: 'desc' },
+      select: { order: true },
+    });
+
+    const newOrder = (lastImage?.order ?? -1) + 1;
+
+    // If this is marked as main, unmark others
+    if (image.isMain) {
+      await db.recipeImage.updateMany({
+        where: { recipeId },
+        data: { isMain: false },
+      });
+    }
+
+    const newImage = await db.recipeImage.create({
+      data: {
+        recipeId,
+        url: image.url,
+        caption: image.caption,
+        stepNumber: image.stepNumber,
+        order: newOrder,
+        isMain: image.isMain ?? false,
+      },
+    });
+
+    return newImage;
+  } catch (error) {
+    console.error('Error adding recipe image:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a recipe image
+ */
+export async function deleteRecipeImage(imageId: string) {
+  try {
+    const deleted = await db.recipeImage.delete({
+      where: { id: imageId },
+    });
+
+    return deleted;
+  } catch (error) {
+    console.error('Error deleting recipe image:', error);
     throw error;
   }
 }

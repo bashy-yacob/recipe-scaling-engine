@@ -23,6 +23,13 @@ export interface CreateRecipeInput {
     content: string;
     order: number;
   }>;
+  images?: Array<{
+    url: string;
+    caption?: string;
+    stepNumber?: number;
+    order: number;
+    isMain?: boolean;
+  }>;
 }
 
 /**
@@ -60,7 +67,7 @@ export async function createRecipe(input: CreateRecipeInput) {
       })
     );
 
-    // Create recipe with ingredients and instructions
+    // Create recipe with ingredients, instructions and images
     const recipe = await db.recipe.create({
       data: {
         userId: input.userId,
@@ -91,6 +98,19 @@ export async function createRecipe(input: CreateRecipeInput) {
               })),
             }
           : undefined,
+
+        // Create images if provided
+        images: input.images
+          ? {
+              create: input.images.map((img) => ({
+                url: img.url,
+                caption: img.caption,
+                stepNumber: img.stepNumber,
+                order: img.order,
+                isMain: img.isMain ?? false,
+              })),
+            }
+          : undefined,
       },
       include: {
         recipeIngredients: {
@@ -101,6 +121,11 @@ export async function createRecipe(input: CreateRecipeInput) {
         instructions: {
           orderBy: {
             stepNumber: 'asc',
+          },
+        },
+        images: {
+          orderBy: {
+            order: 'asc',
           },
         },
         user: true,
