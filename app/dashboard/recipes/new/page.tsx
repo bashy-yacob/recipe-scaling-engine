@@ -6,8 +6,9 @@ import {
   HStack, Stack, Badge, Field, Grid, IconButton, SimpleGrid,
 } from '@chakra-ui/react';
 import { toaster } from '@/components/ui/toaster';
+import { ImageUploader } from '@/components/shared/ImageUploader';
 import Link from 'next/link';
-import { ArrowRight, Save, Plus, Trash2, Image as ImageIcon, Sparkles, X, Star, Link as LinkIcon } from 'lucide-react';
+import { ArrowRight, Save, Plus, Trash2, Sparkles, X, Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Ingredient {
@@ -451,25 +452,25 @@ export default function NewRecipePage() {
             </Card.Header>
             <Card.Body px={8} pb={8}>
               {images.length === 0 ? (
-                <Box
-                  border="2px dashed" borderColor="gray.200" borderRadius="lg" p={10}
-                  textAlign="center" bg="gray.50" cursor="pointer"
-                  _hover={{ bg: 'orange.50', borderColor: 'orange.200' }}
-                  onClick={addImage}
-                >
-                  <Stack gap={2} align="center">
-                    <ImageIcon size={40} color="gray" />
-                    <Text fontWeight="medium">לחצי להוספת תמונות</Text>
-                    <Text fontSize="xs" color="gray.500">ניתן להוסיף מספר תמונות לשלבי ההכנה</Text>
-                  </Stack>
-                </Box>
+                <ImageUploader
+                  value=""
+                  placeholder="לחצי להעלאת תמונה ראשונה"
+                  onChange={(url) => {
+                    setImages([{
+                      id: Date.now().toString(),
+                      url,
+                      caption: '',
+                      isMain: true,
+                    }]);
+                  }}
+                />
               ) : (
                 <Stack gap={4}>
                   {images.map((img, idx) => (
                     <Card.Root key={img.id} variant="outline" size="sm">
                       <Card.Body p={4}>
-                        <Grid templateColumns={{ base: "1fr", md: "1fr 2fr auto" }} gap={4} alignItems="center">
-                          <HStack gap={3}>
+                        <Stack gap={4}>
+                          <HStack gap={3} align="start">
                             <Badge 
                               bg={img.isMain ? "orange.500" : "gray.200"} 
                               color={img.isMain ? "white" : "gray.600"} 
@@ -479,41 +480,36 @@ export default function NewRecipePage() {
                               cursor="pointer"
                               onClick={() => setMainImage(img.id)}
                               title={img.isMain ? "תמונה ראשית" : "לחץ להגדרה כתמונה ראשית"}
+                              flexShrink={0}
                             >
                               <Star size={12} style={{ marginLeft: '4px' }} />
                               {img.isMain ? "ראשית" : `${idx + 1}`}
                             </Badge>
+                            <Box flex={1}>
+                              <ImageUploader
+                                value={img.url}
+                                onChange={(url) => {
+                                  const newImages = [...images];
+                                  newImages[idx].url = url;
+                                  setImages(newImages);
+                                }}
+                                onRemove={() => removeImage(img.id)}
+                              />
+                            </Box>
+                          </HStack>
+                          {img.url && (
                             <Input
-                              placeholder="כתובת URL של תמונה"
-                              value={img.url}
+                              placeholder="תיאור (אופציונלי) - לדוגמה: לאחר ערבוב הבצק"
+                              value={img.caption}
                               onChange={(e) => {
                                 const newImages = [...images];
-                                newImages[idx].url = e.target.value;
+                                newImages[idx].caption = e.target.value;
                                 setImages(newImages);
                               }}
                               size="sm"
                             />
-                          </HStack>
-                          <Input
-                            placeholder="תיאור (אופציונלי) - לדוגמה: לאחר ערבוב הבצק"
-                            value={img.caption}
-                            onChange={(e) => {
-                              const newImages = [...images];
-                              newImages[idx].caption = e.target.value;
-                              setImages(newImages);
-                            }}
-                            size="sm"
-                          />
-                          <IconButton 
-                            variant="ghost" 
-                            colorPalette="red" 
-                            onClick={() => removeImage(img.id)}
-                            size="sm"
-                            aria-label="מחק תמונה"
-                          >
-                            <Trash2 size={16} />
-                          </IconButton>
-                        </Grid>
+                          )}
+                        </Stack>
                       </Card.Body>
                     </Card.Root>
                   ))}
