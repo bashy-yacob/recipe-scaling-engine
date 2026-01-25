@@ -1,5 +1,5 @@
 # 📊 סטטוס פרויקט Recipe Scaling Engine
-**תאריך: 25 ינואר 2026** | **סטטוס: 🚀 באוויר בפרודקשן!**
+**עדכון אחרון: 25 ינואר 2026** | **סטטוס: 🚀 באוויר בפרודקשן!**
 
 ---
 
@@ -13,485 +13,348 @@
 
 ---
 
-## 🎯 סיכום מהיר - איפה את אוחזת?
+## 🎯 סיכום מהיר - סטטוס נוכחי
 
-### ✅ מה כבר עובד מקצה לקצה:
+### ✅ מה עובד מקצה לקצה:
 | רכיב | סטטוס | פירוט |
 |------|--------|-------|
-| 🏗️ **Build & Dev** | ✅ מושלם | Next.js 16.1.4, TypeScript 5.9.3, Prisma 7.2.0 |
-| 🗄️ **Database** | ✅ מושלם | **PostgreSQL (Neon)** - פרודקשן בענן! |
-| ☁️ **Hosting** | ✅ מושלם | **Vercel** - deployed ועובד! |
-| ⚖️ **Scaling Algorithms** | ✅ מושלם | linear, logarithmic, sqrt, fixed - 215 שורות |
-| 📐 **Unit Conversions** | ✅ מושלם | metric + imperial - 190 שורות |
-| 💾 **CRUD Operations** | ✅ מושלם | create, read, update, delete - 537 שורות |
-| 🌐 **API Routes** | ✅ מושלם | GET/POST/PUT/DELETE endpoints |
-| 📄 **UI Pages** | ✅ מושלם | list, detail, new, edit pages |
-| 🔔 **Toaster** | ✅ מושלם | התראות למשתמש |
-| 🔐 **Authentication** | ✅ מושלם | NextAuth.js v5 + Credentials + Google OAuth |
-| ⚠️ **Error Boundaries** | ✅ מושלם | error.tsx + global-error.tsx |
-| ⚙️ **Settings Page** | ✅ מושלם | `/settings` - הגדרות משתמש |
-| 🛡️ **Middleware** | ✅ מושלם | הגנה על routes מוגנים |
-| 🤖 **AI Recipe Parsing** | ✅ מושלם | הוספת מתכון מטקסט באמצעות AI |
+| 🏗️ **Build & Dev** | ✅ | Next.js 16.1.4, TypeScript 5, Prisma 7.2.0, Turbopack |
+| 🗄️ **Database** | ✅ | PostgreSQL (Neon) - פרודקשן בענן |
+| ☁️ **Hosting** | ✅ | Vercel - deployed ועובד |
+| ⚖️ **Scaling Algorithms** | ✅ | linear, logarithmic, sqrt, fixed - 216 שורות |
+| 📐 **Unit Conversions** | ✅ | metric + imperial - 190 שורות |
+| 💾 **CRUD Operations** | ✅ | create, read, update, delete - 4 קבצים |
+| 🌐 **API Routes** | ✅ | 6 endpoints פעילים |
+| 📄 **UI Pages** | ✅ | 16 routes (static + dynamic) |
+| 🔔 **Toaster** | ✅ | התראות Chakra UI |
+| 🔐 **Authentication** | ✅ | NextAuth.js v5 + Credentials + Google OAuth |
+| ⚠️ **Error Boundaries** | ✅ | error.tsx + global-error.tsx |
+| ⚙️ **Settings Page** | ✅ | הגדרות משתמש |
+| 🛡️ **Middleware** | ✅ | הגנה על routes (proxy) |
+| 🤖 **AI Recipe Parsing** | ✅ | Groq SDK - הוספה מטקסט |
+| 📝 **Zod Validation** | ✅ | סכמות validation |
 
-### 🟡 מה אפשר להוסיף בעתיד (אופציונלי):
-| רכיב | עדיפות | הערות |
-|------|---------|-------|
-| 📷 **OCR** | נמוכה | הוספה מתמונה - לעתיד |
-| 🌐 **Web Scraping** | נמוכה | הוספה מ-URL - לעתיד |
-| 🎤 **Speech-to-text** | נמוכה | הוספה בקול - לעתיד |
-| 📤 **Import/Export** | נמוכה | יצוא/יבוא מתכונים |
-
-### 📈 אחוז השלמה כללי: 100% ✅
-
-### 🚀 הפרויקט חי!
-1. **✅ Production Deployment** - Vercel + Neon PostgreSQL
-2. **✅ Authentication מלא** - NextAuth.js עם Credentials ו-Google OAuth
-3. **✅ Error Handling** - Error boundaries ברמת האפליקציה והגלובלי
-4. **✅ Settings Page** - עמוד הגדרות עם עדכון פרופיל
-5. **✅ Protected Routes** - Middleware מגן על דפים מוגנים
+### 📈 אחוז השלמה: **100%** ✅
 
 ---
 
-## ✅ תוצאות בדיקה נוכחית
+## 🛠️ Stack טכנולוגי
 
-### סטטוס פרודקשן
-```
-✅ Next.js 16.1.4 - deployed ל-Vercel!
-✅ TypeScript 5.9.3 - עובד בהצלחה!
-✅ Prisma 7.2.0 + PostgreSQL (Neon) - מחובר ועובד!
-✅ כל התלויות מותקנות בהצלחה
-✅ בנייה הצליחה - אין שגיאות!
-✅ אתר חי ב: https://recipe-scaling-engine.vercel.app
-✅ Seed הורץ בהצלחה - יש מתכונים בDB!
-✅ Authentication מוגדר עם NextAuth.js v5
-✅ Protected routes עובדים עם Middleware
-```
+### Frontend
+| טכנולוגיה | גרסה | שימוש |
+|-----------|-------|-------|
+| Next.js | 16.1.4 | App Router + Turbopack |
+| React | 19.2.3 | UI Components |
+| TypeScript | 5.x | Type Safety (strict mode) |
+| Chakra UI | 3.31.0 | Component Library |
+| Framer Motion | 12.28.1 | Animations |
+| Lucide React | 0.562.0 | Icons |
 
-### בדיקת Database (Neon PostgreSQL)
-```
-✅ PostgreSQL database נוצר ב-Neon
-✅ Region: eu-central-1 (Frankfurt)
-✅ Connection: pooled connection
-✅ Schema synced with prisma db push
-✅ Seed data נטען בהצלחה:
-   - 1 משתמש demo
-   - 15 מרכיבים
-   - 8 המרות יחידות
-   - 10 תגיות
-   - 3 מתכונים
-```
+### Backend
+| טכנולוגיה | גרסה | שימוש |
+|-----------|-------|-------|
+| Prisma | 7.2.0 | ORM + Database |
+| PostgreSQL | Neon | Production Database |
+| NextAuth.js | 5.0.0-beta.30 | Authentication |
+| Zod | 4.3.5 | Validation |
+| bcryptjs | 3.0.3 | Password Hashing |
+| Groq SDK | 0.37.0 | AI Recipe Parsing |
 
-### בדיקת Authentication
+---
+
+## ✅ תוצאות Build אחרון
+
 ```
-✅ NextAuth.js v5 מוגדר
-✅ Credentials Provider - התחברות עם אימייל/סיסמה
-✅ Google OAuth Provider - מוכן (צריך להגדיר env vars)
-✅ JWT Sessions
-✅ Protected routes עם middleware
-✅ עמודי Login/Register מוכנים
-✅ API Route להרשמה עם hash לסיסמה (bcryptjs)
+✓ Compiled successfully in 16.2s (Turbopack)
+✓ TypeScript check passed in 27.9s
+✓ 15 static pages generated
+✓ 6 dynamic API routes
+
+⚠ Note: "middleware" file convention is deprecated, use "proxy" instead
 ```
 
-### מבנה הפרויקט
+### Routes שנבנו:
+| Route | Type | תיאור |
+|-------|------|-------|
+| `/` | Static | דף הבית |
+| `/auth/login` | Static | התחברות |
+| `/auth/register` | Static | הרשמה |
+| `/auth/error` | Static | שגיאות auth |
+| `/dashboard/recipes` | Static | רשימת מתכונים |
+| `/dashboard/recipes/new` | Static | יצירת מתכון + AI parsing |
+| `/dashboard/recipes/[id]` | Dynamic | צפייה במתכון + scaling |
+| `/dashboard/recipes/[id]/edit` | Dynamic | עריכת מתכון |
+| `/settings` | Static | הגדרות משתמש |
+| `/demo` | Static | דף הדגמה |
+| `/api/recipes` | Dynamic | GET/POST recipes |
+| `/api/recipes/[id]` | Dynamic | GET/PUT/DELETE recipe |
+| `/api/recipes/parse` | Dynamic | AI parsing (Groq) |
+| `/api/auth/[...nextauth]` | Dynamic | Auth handlers |
+| `/api/auth/register` | Dynamic | הרשמה API |
+| `/api/user/settings` | Dynamic | הגדרות API |
+
+---
+
+## 📁 מבנה הפרויקט
+
 ```
-✅ next.js app router - מוגדר כראוי
-✅ Chakra UI v3 - מוגדר ועובד
-✅ Prisma ORM - מחובר ועובד
-✅ דפים: home, recipes, recipes/new, recipes/[id], demo, settings - כולם עובדים!
-✅ Navbar + Footer - בנויים ידנית
-✅ lib/db.ts - Prisma Client מוגדר (lazy initialization)
-✅ API Routes - GET/POST/DELETE/PUT עובדים!
-✅ Authentication - Login/Register/Logout עובדים!
-✅ Error Boundaries - error.tsx + global-error.tsx מוגדרים
+recipe-scaling-engine/
+├── app/
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── [...nextauth]/route.ts  # NextAuth handlers
+│   │   │   └── register/route.ts       # הרשמה (60 שורות)
+│   │   ├── recipes/
+│   │   │   ├── route.ts                # GET/POST (45 שורות)
+│   │   │   ├── [id]/route.ts           # GET/PUT/DELETE (70 שורות)
+│   │   │   └── parse/route.ts          # AI parsing (83 שורות)
+│   │   └── user/settings/route.ts      # GET/PUT (90 שורות)
+│   ├── auth/
+│   │   ├── login/page.tsx
+│   │   ├── register/page.tsx
+│   │   └── error/page.tsx
+│   ├── dashboard/
+│   │   ├── layout.tsx
+│   │   ├── Providers.tsx
+│   │   ├── ingredients/               # ריק - לעתיד
+│   │   └── recipes/
+│   │       ├── page.tsx               # 322 שורות - רשימה + חיפוש
+│   │       ├── new/page.tsx           # 538 שורות - יצירה + AI
+│   │       └── [id]/
+│   │           ├── page.tsx           # 217 שורות - צפייה + scaling
+│   │           └── edit/page.tsx      # 567 שורות - עריכה מלאה
+│   ├── demo/page.tsx
+│   ├── settings/page.tsx              # 234 שורות
+│   ├── error.tsx                      # Error Boundary
+│   ├── global-error.tsx               # Global Error
+│   ├── loading.tsx
+│   ├── not-found.tsx
+│   ├── layout.tsx
+│   └── page.tsx                       # דף הבית
+├── components/
+│   ├── recipes/                       # ריק - לעתיד
+│   ├── shared/
+│   │   ├── Navbar.tsx
+│   │   └── Footer.tsx
+│   └── ui/toaster.tsx
+├── lib/
+│   ├── auth.ts                        # NextAuth config (51 שורות)
+│   ├── auth.config.ts                 # Edge-compatible
+│   ├── db.ts                          # Prisma Client
+│   ├── recipes/
+│   │   ├── create.ts                  # 114 שורות
+│   │   ├── read.ts                    # 155 שורות
+│   │   ├── update.ts                  # ~200 שורות
+│   │   └── delete.ts                  # ~60 שורות
+│   ├── scaling/
+│   │   ├── algorithms.ts              # 216 שורות ⭐
+│   │   └── conversions.ts             # 190 שורות
+│   └── validations/recipe.ts          # 30 שורות - Zod
+├── prisma/
+│   ├── schema.prisma                  # 293 שורות, 9 models
+│   ├── seed.ts                        # 766 שורות
+│   └── dev.db                         # SQLite (dev)
+├── types/recipe.ts                    # TypeScript interfaces
+└── middleware.ts                      # Auth protection
 ```
 
 ---
 
-## 📋 סיכום המצב (TODO List)
+## 🔐 Authentication Flow
 
-### ✅ הושלם - קריטי
-- [x] **תיקון בנייה**: Build עובר בהצלחה!
-- [x] **Types**: `types/recipe.ts` עם `Recipe`, `Ingredient`, `Instruction` interfaces ✅
-- [x] **Validation**: `lib/validations/recipe.ts` עם Zod schemas ✅
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│  /auth/login │────▶│ NextAuth.js  │────▶│  Protected  │
+│ /auth/register│    │  Credentials │     │   Routes    │
+└─────────────┘     │  + Google    │     │ /dashboard  │
+                    └──────────────┘     │ /settings   │
+                                         └─────────────┘
+```
 
-### ✅ הושלם - עדיפות גבוהה
-- [x] **Smart Scaling Algorithms** `lib/scaling/algorithms.ts` (215 שורות!):
-  - [x] Linear scaling
-  - [x] Logarithmic scaling (שמרים, שוקולד)
-  - [x] Square root scaling (מלח, תבלינים)
-  - [x] Fixed ingredients
-  - [x] roundForCooking - עיגול לכמויות מעשיות
-- [x] **Unit Conversions** `lib/scaling/conversions.ts` (190 שורות!):
-  - [x] grams ↔ cups, ml ↔ tsp, etc.
-  - [x] תמיכה במדידות אימפריאליות ומטריות
-  - [x] gramsToCups עם תמיכה במרכיבים שונים
-- [x] **Database Operations**:
-  - [x] `lib/recipes/create.ts` - שמירת מתכון (113 שורות)
-  - [x] `lib/recipes/read.ts` - קריאת מתכונים (158 שורות)
-  - [x] `lib/recipes/update.ts` - עדכון (209 שורות)
-  - [x] `lib/recipes/delete.ts` - מחיקה (57 שורות)
+### Providers מוגדרים:
+- ✅ **Credentials** - email + password (bcrypt hash)
+- 🟡 **Google OAuth** - מוכן (צריך env vars בפרודקשן)
 
-### ✅ הושלם - Authentication (חדש!)
-- [x] **NextAuth.js v5** `lib/auth.ts` + `lib/auth.config.ts`:
-  - [x] Credentials Provider - התחברות עם אימייל/סיסמה
-  - [x] Google OAuth Provider - מוכן (צריך env vars)
-  - [x] JWT Sessions
-  - [x] PrismaAdapter לשמירת משתמשים
-- [x] **API Routes**:
-  - [x] `POST /api/auth/register` - הרשמה עם hash סיסמה (bcryptjs)
-  - [x] `PUT /api/user/settings` - עדכון הגדרות משתמש
-- [x] **UI Pages**:
-  - [x] `/auth/login` - עמוד התחברות
-  - [x] `/auth/register` - עמוד הרשמה
-  - [x] `/auth/error` - עמוד שגיאות authentication
-- [x] **Middleware** `middleware.ts`:
-  - [x] הגנה על routes מוגנים (/dashboard, /settings)
-  - [x] הפניה אוטומטית ל-login
-  - [x] הפניה אוטומטית ל-dashboard אם כבר מחובר
-
-### ✅ הושלם - עדיפות בינונית
-- [x] **Seed Data** `prisma/seed.ts` (766 שורות!):
-  - [x] יצירת משתמש demo
-  - [x] יצירת מתכונים לדוגמה
-  - [x] יצירת מרכיבים
-- [x] **UI Components**:
-  - [x] Toast notifications
-  - [x] Loading states (Spinner)
-  - [x] Error boundaries (error.tsx + global-error.tsx)
-- [x] **Pages**:
-  - [x] `/dashboard/recipes` - רשימת מתכונים עם חיפוש
-  - [x] `/dashboard/recipes/[id]` - עמוד מתכון בודד עם Scaling!
-  - [x] `/dashboard/recipes/new` - יצירת מתכון חדש
-  - [x] `/dashboard/recipes/[id]/edit` - עריכת מתכון
-  - [x] `/settings` - הגדרות משתמש
-- [x] **API Routes**:
-  - [x] `GET /api/recipes` - קבלת כל המתכונים
-  - [x] `POST /api/recipes` - יצירת מתכון
-  - [x] `GET /api/recipes/[id]` - קבלת מתכון ספציפי
-  - [x] `PUT /api/recipes/[id]` - עדכון מתכון
-  - [x] `DELETE /api/recipes/[id]` - מחיקת מתכון
-
-### 🟢 עדיפות נמוכה - לעתיד (אופציונלי)
-- [ ] OCR (הוספה מתמונה)
-- [ ] Web scraping (הוספה מ-URL)
-- [ ] Speech-to-text
-- [ ] Import/Export
-- [ ] Modal component מתקדם
+### Protected Routes:
+- `/dashboard/*` - כל עמודי המתכונים
+- `/settings` - הגדרות משתמש
 
 ---
 
-## 🛠️ תבנית ריצה בפרויקט
+## ⚖️ Scaling Algorithms
 
-### תרגיל 1: תיקון בנייה (5 דקות)
-```bash
-# דרך 1: הסרת Google Fonts
-# עדכן app/layout.tsx - הסר את import Geist
+הפיצ'ר המרכזי של הפרויקט!
 
-# דרך 2: טעינה locally (מומלץ לארוך טווח)
-npm install next-fonts
-```
+| Algorithm | שימוש | נוסחה |
+|-----------|--------|-------|
+| `linear` | קמח, סוכר, מים, ביצים | `amount * ratio` |
+| `logarithmic` | שמרים, אבקת אפייה, קקאו | `amount * (1 + log(ratio)/log(4))` |
+| `sqrt` | מלח, תבלינים, שום | `amount * sqrt(ratio)` |
+| `fixed` | ווניל, קישוט, ציפוי | `amount` (לא משתנה) |
 
-### תרגיל 2: יצירת Types (10 דקות)
-```bash
-# תיקייה שכבר קיימת: types/
-# צור: types/recipe.ts
-touch types/recipe.ts
-```
-
-**תוכן חיוני:**
+### דוגמה:
 ```typescript
-// types/recipe.ts
-export interface Ingredient {
-  id: string;
-  name: string;
-  amount: number;
-  unit: string;
-  scalingRule: 'linear' | 'logarithmic' | 'sqrt' | 'fixed';
-}
-
-export interface Recipe {
-  id: string;
-  userId: string;
-  title: string;
-  servings: number;
-  ingredients: Ingredient[];
-  instructions: string[];
-  cookTime: number;
-  prepTime: number;
-}
+// scaling 4 → 8 מנות (ratio = 2)
+flour:  200g * 2     = 400g  (linear)
+yeast:  7g * 1.25    = 8.75g (logarithmic)
+salt:   5g * 1.41    = 7g    (sqrt)
+vanilla: 1tsp        = 1tsp  (fixed)
 ```
 
-### תרגיל 3: Validation Schemas (10 דקות)
-```bash
-# צור: lib/validations/recipe.ts
-touch lib/validations/recipe.ts
-```
+---
 
-**תוכן חיוני:**
+## 📊 Database Schema (Prisma)
+
+### 9 Models מוגדרים:
+| Model | תיאור | שדות עיקריים |
+|-------|--------|---------------|
+| **User** | משתמשים | email, password, preferences |
+| **Account** | OAuth accounts | provider, accessToken |
+| **Session** | sessions | sessionToken, expires |
+| **VerificationToken** | אימות | token, expires |
+| **Recipe** | מתכונים | title, servings, prepTime, cookTime |
+| **Ingredient** | מרכיבים | name, category, scalingRule |
+| **RecipeIngredient** | קשר מתכון-מרכיב | amount, unit |
+| **Instruction** | הוראות | stepNumber, description |
+| **BakingParameters** | פרמטרי אפייה | temperature, humidity |
+
+---
+
+## 🤖 AI Recipe Parsing (Groq)
+
+הוספת מתכון מטקסט חופשי:
+
 ```typescript
-// lib/validations/recipe.ts
-import { z } from 'zod';
+POST /api/recipes/parse
+Body: { text: "מתכון בעברית..." }
 
-export const ingredientSchema = z.object({
-  name: z.string().min(1),
-  amount: z.number().positive(),
-  unit: z.string(),
-  scalingRule: z.enum(['linear', 'logarithmic', 'sqrt', 'fixed']),
-});
-
-export const recipeSchema = z.object({
-  title: z.string().min(1),
-  servings: z.number().int().positive(),
-  ingredients: z.array(ingredientSchema),
-});
-```
-
-### תרגיל 4: Scaling Algorithms (30 דקות) ⭐⭐⭐
-```bash
-# צור: lib/scaling/algorithms.ts
-touch lib/scaling/algorithms.ts
-```
-
-**תוכן חיוני:**
-```typescript
-// lib/scaling/algorithms.ts
-
-interface ScalingRule {
-  type: 'linear' | 'logarithmic' | 'sqrt' | 'fixed';
-  baseAmount: number;
-  baseServings: number;
-}
-
-export function scaleIngredient(rule: ScalingRule, targetServings: number): number {
-  const ratio = targetServings / rule.baseServings;
-  
-  switch (rule.type) {
-    case 'linear':
-      // שמרים: עולים ליניארית אבל הרבה יותר ببطء
-      return rule.baseAmount * Math.log(1 + ratio * 0.5);
-    
-    case 'logarithmic':
-      // שמרים: לא משתנים הרבה
-      return rule.baseAmount * (1 + Math.log(ratio) / Math.log(4));
-    
-    case 'sqrt':
-      // מלח, תבלינים: גדלים בשורש ריבועי
-      return rule.baseAmount * Math.sqrt(ratio);
-    
-    case 'fixed':
-      // אינגריד (אפר, ווניל): לא משתנים בכלל
-      return rule.baseAmount;
+Response: {
+  success: true,
+  data: {
+    title: "עוגת שוקולד",
+    servings: 8,
+    prepTime: 20,
+    cookTime: 45,
+    ingredients: [
+      { name: "קמח", amount: 200, unit: "גרם", scalingRule: "linear" },
+      { name: "שמרים", amount: 7, unit: "גרם", scalingRule: "logarithmic" }
+    ],
+    instructions: ["שלב 1", "שלב 2", ...]
   }
 }
 ```
 
-### תרגיל 5: DB Operations (30 דקות)
+### Scaling Rules אוטומטיים (AI קובע):
+- שמרים, אבקת אפייה → `logarithmic`
+- מלח, פלפל, שום → `sqrt`
+- קישוט, ציפוי → `fixed`
+- כל השאר → `linear`
+
+---
+
+## 🟡 פיצ'רים אופציונליים לעתיד
+
+| רכיב | עדי הערות |
+|------|---------|-------|
+| 📷 **OCR** | נמוכה | הוספה מתמונה |
+| 🌐 **Web Sc נמוכה | הוספה מ-URL |
+| 🎤 **Speech-to-text** | נמוכה | הקלטת מתכון בקול |
+| 📤 **Import/Export** | נמוכה | יצוא/יבוא JSON |
+| 🖼️ **Image Upload** | בינונית | העלאת תמונות מתכונים |
+| 🔍 **Advanced Search** | בינונית | חיפוש לפי מרכיבים/תגיות |
+| 🏷️ **Tags System** | בינונית | תגיות למתכונים |
+| ⭐ **Favorites** | בינונית | מתכונים מועדפים |
+
+---
+
+## 📋 סיכום רכיבים - TODO List
+
+### ✅ הושלם - Core Features
+- [x] Build עובר בהצלחה (Turbopack)
+- [x] TypeScript strict mode
+- [x] Prisma + PostgreSQL (Neon)
+- [x] Types: `types/recipe.ts`
+- [x] Validation: `lib/validations/recipe.ts`
+- [x] Scaling Algorithms: `lib/scaling/algorithms.ts`
+- [x] Unit Conversions: `lib/scaling/conversions.ts`
+- [x] CRUD: create, read, update, delete
+
+### ✅ הושלם - Authentication
+- [x] NextAuth.js v5 configuration
+- [x] Credentials Provider (email/password)
+- [x] Google OAuth Provider (ready)
+- [x] JWT Sessions
+- [x] PrismaAdapter
+- [x] Registration API with bcrypt
+- [x] Middleware protection
+
+### ✅ הושלם - UI Pages
+- [x] `/dashboard/recipes` - רשימה + חיפוש
+- [x] `/dashboard/recipes/[id]` - צפייה + scaling
+- [x] `/dashboard/recipes/new` - יצירה + AI parsing
+- [x] `/dashboard/recipes/[id]/edit` - עריכה מלאה
+- [x] `/settings` - הגדרות משתמש
+- [x] `/auth/login` - התחברות
+- [x] `/auth/register` - הרשמה
+- [x] Error boundaries
+
+### ✅ הושלם - API Routes
+- [x] `GET/POST /api/recipes`
+- [x] `GET/PUT/DELETE /api/recipes/[id]`
+- [x] `POST /api/recipes/parse` (AI)
+- [x] `POST /api/auth/register`
+- [x] `GET/PUT /api/user/settings`
+
+### 🟢 לעתיד (אופציונלי)
+- [ ] OCR (תמונה)
+- [ ] Web scraping (URL)
+- [ ] Speech-to-text
+- [ ] Import/Export JSON
+- [ ] Image Upload
+- [ ] Modal components
+
+---
+
+## 🚀 פקודות שימושיות
+
 ```bash
-# צור: lib/recipes/create.ts
-touch lib/recipes/create.ts
-```
+# Development
+npm run dev
 
-**תוכן חיוני:**
-```typescript
-// lib/recipes/create.ts
-import { db } from '@/lib/db';
-import { recipeSchema } from '@/lib/validations/recipe';
+# Build
+npm run build
 
-export async function createRecipe(userId: string, data: unknown) {
-  const validated = recipeSchema.parse(data);
-  
-  return db.recipe.create({
-    data: {
-      ...validated,
-      userId,
-      recipeIngredients: {
-        create: validated.ingredients.map(ing => ({
-          ingredient: { create: ing },
-          amount: ing.amount,
-          unit: ing.unit,
-        })),
-      },
-    },
-  });
-}
+# Type Check
+npx tsc --noEmit
+
+# Prisma
+npx prisma studio     # GUI לדאטאבייס
+npx prisma db push    # sync schema
+npx prisma db seed    # הרצת seed
+
+# Deploy
+npx vercel --prod
 ```
 
 ---
 
-## 📁 מבנה קבצים שצריך ליצור
+## 📊 סטטיסטיקות קוד
 
-```
-recipe-scaling-engine/
-├── types/
-│   ├── recipe.ts          ← צריך ליצור
-│   ├── ingredient.ts      ← אופציונלי
-│   └── user.ts            ← אופציונלי
-├── lib/
-│   ├── db.ts              ✅ קיים
-│   ├── recipes/           ← צריך ליצור
-│   │   ├── create.ts
-│   │   ├── read.ts
-│   │   ├── update.ts
-│   │   └── delete.ts
-│   ├── scaling/           ← צריך ליצור
-│   │   ├── algorithms.ts  ⭐⭐⭐ חשוב מאוד!
-│   │   └── conversions.ts
-│   ├── utils/             ← צריך ליצור
-│   │   ├── formatters.ts
-│   │   └── validators.ts
-│   └── validations/       ← צריך ליצור
-│       ├── recipe.ts
-│       ├── ingredient.ts
-│       └── index.ts
-├── components/
-│   └── ... (עדיין לא צריך)
-├── app/
-│   ├── recipes/
-│   │   ├── [id]/          ← צריך ליצור
-│   │   │   └── page.tsx
-│   │   └── ... ✅
-│   └── ... ✅
-└── prisma/
-    ├── schema.prisma      ✅ קיים
-    └── seed.ts            ← צריך להשלים
-```
+| קובץ/תיקייה | שורות | תיאור |
+|-------------|--------|-------|
+| `lib/scaling/algorithms.ts` | 216 | אלגוריתמי scaling |
+| `lib/scaling/conversions.ts` | 190 | המרות יחידות |
+| `lib/recipes/*` | ~530 | CRUD operations |
+| `prisma/schema.prisma` | 293 | Database schema |
+| `prisma/seed.ts` | 766 | Seed data |
+| `app/dashboard/recipes/*` | ~1650 | UI pages |
+| `app/api/*` | ~350 | API routes |
+| **סה"כ** | **~4000+** | קוד פעיל |
 
 ---
 
-## 🚀 הוראות להמשך
+**סטטוס: ✅ הפרויקט מוכן לפרודקשן!**
 
-### סדר ביצוע (מחוב):
+**עדכון אחרון: 25 ינואר 2026**
 
-1. **תיקון בנייה** (5 דקות)
-   ```bash
-   # בחר אחד:
-   # א) הסר Geist fonts מ app/layout.tsx
-   # ב) או התקן locally
-   ```
-
-2. **Types** (10 דקות)
-   ```bash
-   npm run dev
-   # תיקייה types/ כבר קיימת - פשוט צור קבצים
-   ```
-
-3. **Validation** (10 דקות)
-   - צור `lib/validations/recipe.ts`
-
-4. **Scaling Algorithms** (30 דקות) ⭐⭐⭐
-   - **זה הפיצ'ר המרכזי!**
-   - אפשר לעשות זה בלי DB
-   - כל ה-logic כבר מוכן בראש
-
-5. **Database Layer** (30 דקות)
-   - צור `lib/recipes/create.ts` וכו'
-
-6. **Seed Data** (15 דקות)
-   - עדכן `prisma/seed.ts`
-   - ריצה: `npx prisma db seed`
-
-7. **UI Integration** (40 דקות)
-   - עדכן `/recipes/new/page.tsx` - חבר לDB
-   - צור `/recipes/page.tsx` - הצג מתכונים
-   - צור `/recipes/[id]/page.tsx` - עמוד מתכון
-
----
-
-## 🎯 אמת מידה לסיום שלבים
-
-### שלב 1: סכום בצורה טוב ✅
-- [ ] Build עובד בלי שגיאות
-- [ ] `npm run dev` רץ בהצלחה
-
-### שלב 2: Scaling עובד ✅
-- [ ] Types מלא
-- [ ] Validation עובד
-- [ ] Algorithms נכונים
-
-### שלב 3: DB עובד ✅
-- [ ] יכולות ליצור מתכון
-- [ ] יכולות לקרוא מתכונים
-- [ ] יכולות לעדכן
-- [ ] יכולות למחוק
-
-### שלב 4: UI מלא ✅
-- [ ] טופס הוספה מחובר
-- [ ] רשימה מציגה נתונים אמיתיים
-- [ ] עמוד בודד עובד
-
----
-
-## 💡 טיפים חשובים
-
-### 1️⃣ Scaling Algorithms
-- זה הפיצ'ר הכי חשוב - כל שאר זה הגדול
-- אפשר לעשות בלי מאפיה/צמחי תזונה
-- יש כן אלגוריתמים ידועים עבור זה
-
-### 2️⃣ Database
-- SQLite כרגע - בחרנו זה עבור development
-- כל query שכתוב עבור Prisma יעבוד גם עם PostgreSQL
-
-### 3️⃣ TypeScript
-- strict mode כבר הפעיל
-- כל type-checking עובד בנייה
-
-### 4️⃣ Build Issue
-- זה רק Google Fonts - לא משפיע על פונקציונליות
-- תיקון: הסרת 2 שורות מ layout.tsx
-
----
-
-## 📞 איך להשתמש בקובץ הזה
-
-כל פעם שאתה מתחיל עבודה חדשה:
-1. קרא את **"סדר ביצוע"** לעיל
-2. בחר בשלב הבא
-3. בצע את הוראות התרגיל
-4. בדוק את "אמת המידה" לסיום
-
----
-
-## 📊 עדכון הרמה
-
-| היבט | סטטוס | הערות |
-|------|--------|-------|
-| **Project Setup** | ✅ 100% | Next.js, TypeScript, Prisma מוכן |
-| **Database Schema** | ✅ 100% | 9 טבלאות, 3 migrations מוכנים |
-| **Build System** | ✅ 100% | בנייה עוברת בהצלחה! |
-| **Types & Validation** | ✅ 100% | types/recipe.ts + lib/validations/recipe.ts ✅ |
-| **Scaling Algorithms** | ✅ 100% | 215 שורות! linear, log, sqrt, fixed ✅ |
-| **Unit Conversions** | ✅ 100% | 190 שורות! metric + imperial ✅ |
-| **DB Operations** | ✅ 100% | CRUD מלא - 537 שורות! |
-| **Seed Data** | ✅ 100% | 766 שורות! מתכונים ומרכיבים |
-| **API Routes** | ✅ 100% | GET/POST/PUT/DELETE + Auth + Settings |
-| **UI Pages** | ✅ 100% | list, detail, new, edit, settings - כולם עובדים! |
-| **Toast Notifications** | ✅ 100% | Toaster component מוכן |
-| **Authentication** | ✅ 100% | NextAuth.js v5 + Credentials + Google OAuth ✅ |
-| **Error Boundaries** | ✅ 100% | error.tsx + global-error.tsx מוגדרים ✅ |
-| **Settings Page** | ✅ 100% | `/settings` עם עדכון פרופיל ✅ |
-| **Middleware** | ✅ 100% | Protected routes עובדים ✅ |
-| **AI Recipe Parsing** | ✅ 100% | הוספת מתכון מטקסט באמצעות AI (OpenAI) ✅ |
-| **Overall Completion** | 🟢 ~99% | **הפרויקט מוכן לפרודקשן!** |
-
----
-
-## 🎯 מה נשאר (אופציונלי)
-
-### פיצ'רים מתקדמים לעתיד:
-1. **OCR** - הוספת מתכון מתמונה
-2. **Web Scraping** - הוספת מתכון מ-URL
-3. **Speech-to-text** - הקלטת מתכון בקול
-4. **Import/Export** - יצוא/יבוא מתכונים
-
-### שיפורים אפשריים:
-1. **Modal Components** - לאישור מחיקה וכו'
-2. **Google OAuth** - הגדרת env vars לפרודקשן
-3. **PostgreSQL** - מעבר מ-SQLite לפרודקשן
-4. **Image Upload** - העלאת תמונות מתכונים
-
----
-
-**סטטוס אחרון: ✅ הפרויקט מוכן לפרודקשן!**
-**עדכון אחרון: 22 ינואר 2026**
-**כולל: Authentication מלא, Error Boundaries, Settings Page, Protected Routes, AI Parsing**
+**כולל:** Authentication מלא, Error Boundaries, Settings Page, Protected Routes, AI Recipe Parsing (Groq)
