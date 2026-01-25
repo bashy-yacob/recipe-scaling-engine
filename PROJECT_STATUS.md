@@ -1,5 +1,5 @@
 # 📊 סטטוס פרויקט Recipe Scaling Engine
-**עדכון אחרון: 25 ינואר 2026** | **סטטוס: 🚀 באוויר בפרודקשן!**
+**עדכון אחרון: 25 ינואר 2026, 22:30** | **סטטוס: 🚀 באוויר בפרודקשן!**
 
 ---
 
@@ -33,6 +33,9 @@
 | 🛡️ **Middleware** | ✅ | הגנה על routes (proxy) |
 | 🤖 **AI Recipe Parsing** | ✅ | Groq SDK - הוספה מטקסט |
 | 📝 **Zod Validation** | ✅ | סכמות validation |
+| 🔒 **מתכונים פרטיים** | ✅ | isPublic - מתכונים אישיים לכל משתמש |
+| 🌍 **מתכונים ציבוריים** | ✅ | שיתוף מתכונים עם הקהילה |
+| 📂 **טאבים מתכונים** | ✅ | "המתכונים שלי" / "מתכונים ציבוריים" |
 
 ### 📈 אחוז השלמה: **100%** ✅
 
@@ -288,6 +291,15 @@ Response: {
 - [x] Registration API with bcrypt
 - [x] Middleware protection
 
+### ✅ הושלם - פרטיות מתכונים (חדש! 25/01/26)
+- [x] שדה `isPublic` במודל Recipe (ברירת מחדל: פרטי)
+- [x] API עם אימות session אמיתי (לא demo user)
+- [x] הגבלת גישה - רק הבעלים או ציבורי
+- [x] טאבים: "המתכונים שלי" / "מתכונים ציבוריים"
+- [x] כפתור פרסום/הסתרה בכל כרטיס מתכון
+- [x] תגיות סטטוס: 🌍 ציבורי / 🔒 פרטי
+- [x] הודעות Toast בעת שינוי סטטוס
+
 ### ✅ הושלם - UI Pages
 - [x] `/dashboard/recipes` - רשימה + חיפוש
 - [x] `/dashboard/recipes/[id]` - צפייה + scaling
@@ -355,6 +367,6 @@ npx vercel --prod
 
 **סטטוס: ✅ הפרויקט מוכן לפרודקשן!**
 
-**עדכון אחרון: 25 ינואר 2026**
+**עדכון אחרון: 25 ינואר 2026, 22:30**
 
-**כולל:** Authentication מלא, Error Boundaries, Settings Page, Protected Routes, AI Recipe Parsing (Groq)
+**כולל:** Authentication מלא, Error Boundaries, Settings Page, Protected Routes, AI Recipe Parsing (Groq), מתכונים פרטיים/ציבוריים עם כפתור פרסום
