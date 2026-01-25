@@ -14,11 +14,14 @@ import {
   Card,
   Center,
   Spinner,
+  Tabs,
 } from '@chakra-ui/react';
 import Link from 'next/link';
-import { Plus, Search, ChefHat, Sparkles, Heart, Tag, BookOpen, Link as LinkIcon, Image as ImageIcon, Clock, Users, AlertTriangle } from 'lucide-react';
+import { Plus, Search, ChefHat, Sparkles, Heart, Tag, BookOpen, Link as LinkIcon, Image as ImageIcon, Clock, Users, AlertTriangle, Globe, Lock, Eye } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { toaster } from '@/components/ui/toaster';
 
 interface Recipe {
   id: string;
@@ -28,6 +31,8 @@ interface Recipe {
   prepTime?: number;
   cookTime?: number;
   isComplete?: boolean;
+  isPublic?: boolean;
+  userId: string;
   recipeIngredients: Array<{ ingredient: { name: string } }>;
   instructions: Array<{ content: string }>;
 }
@@ -36,7 +41,10 @@ export default function RecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'mine' | 'public'>('mine');
   const router = useRouter();
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id;
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -55,9 +63,42 @@ export default function RecipesPage() {
     fetchRecipes();
   }, []);
 
-  const filteredRecipes = recipes.filter(recipe =>
+  const togglePublish = async (e: React.MouseEvent, recipeId: string, currentlyPublic: boolean) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    try {
+      const response = await fetch(`/api/recipes/${recipeId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublic: !currentlyPublic }),
+      });
+      
+      if (!response.ok) throw new Error('Failed to update');
+      
+      setRecipes(prev => prev.map(r => 
+        r.id === recipeId ? { ...r, isPublic: !currentlyPublic } : r
+      ));
+      
+      toaster.success({
+        title: currentlyPublic ? 'המתכון הפך לפרטי' : 'המתכון פורסם!',
+        description: currentlyPublic ? 'רק את יכולה לראות אותו עכשיו' : 'עכשיו כולם יכולים לראות את המתכון',
+      });
+    } catch (error) {
+      toaster.error({ title: 'שגיאה בעדכון המתכון' });
+    }
+  };
+
+  // Filter recipes by search
+  const searchFiltered = recipes.filter(recipe =>
     recipe.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Split into my recipes and public recipes
+  const myRecipes = searchFiltered.filter(r => r.userId === currentUserId);
+  const publicRecipes = searchFiltered.filter(r => r.isPublic && r.userId !== currentUserId);
+
+  const displayedRecipes = activeTab === 'mine' ? myRecipes : publicRecipes;
 
 
   return (
@@ -70,10 +111,10 @@ export default function RecipesPage() {
             <HStack justify="space-between" align="center" flexWrap="wrap" gap={6}>
               <Stack gap={1}>
                 <Heading size="2xl" fontWeight="extrabold" color="gray.800">
-                  המתכונים שלי
+                  ספר המתכונים
                 </Heading>
                 <Text color="gray.500" fontSize="lg">
-                  נהלי את ספר הבישול הדיגיטלי האישי שלך
+                  המתכונים שלך והמתכונים של הקהילה
                 </Text>
               </Stack>
               <Button
@@ -119,12 +160,35 @@ export default function RecipesPage() {
               </Box>
             </Box>
 
-            {/* סטטיסטיקות */}
+            {/* טאבים - המתכונים שלי / ציבוריים */}
             <Center>
-              <HStack gap={{ base: 4, md: 10 }} flexWrap="wrap" justify="center">
-                <StatItem icon={BookOpen} label="מתכונים" count={recipes.length} color="blue" />
-                <StatItem icon={Heart} label="מועדפים" count={0} color="red" />
-                <StatItem icon={Tag} label="תגיות" count={0} color="purple" />
+              <HStack gap={4} bg="gray.100" p={1} borderRadius="xl">
+                <Button
+                  onClick={() => setActiveTab('mine')}
+                  bg={activeTab === 'mine' ? 'white' : 'transparent'}
+                  color={activeTab === 'mine' ? 'orange.600' : 'gray.600'}
+                  boxShadow={activeTab === 'mine' ? 'sm' : 'none'}
+                  _hover={{ bg: activeTab === 'mine' ? 'white' : 'gray.200' }}
+                  borderRadius="lg"
+                  px={6}
+                  py={2}
+                >
+                  <BookOpen size={18} style={{ marginLeft: '8px' }} />
+                  המתכונים שלי ({myRecipes.length})
+                </Button>
+                <Button
+                  onClick={() => setActiveTab('public')}
+                  bg={activeTab === 'public' ? 'white' : 'transparent'}
+                  color={activeTab === 'public' ? 'green.600' : 'gray.600'}
+                  boxShadow={activeTab === 'public' ? 'sm' : 'none'}
+                  _hover={{ bg: activeTab === 'public' ? 'white' : 'gray.200' }}
+                  borderRadius="lg"
+                  px={6}
+                  py={2}
+                >
+                  <Globe size={18} style={{ marginLeft: '8px' }} />
+                  מתכונים ציבוריים ({publicRecipes.length})
+                </Button>
               </HStack>
             </Center>
           </Stack>
@@ -137,93 +201,140 @@ export default function RecipesPage() {
           <Center w="full" h="400px">
             <Spinner size="xl" color="orange.500" />
           </Center>
-        ) : filteredRecipes.length === 0 ? (
+        ) : displayedRecipes.length === 0 ? (
           <Center w="full">
-            <EmptyState />
+            {activeTab === 'mine' ? <EmptyState /> : <EmptyPublicState />}
           </Center>
         ) : (
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-            {filteredRecipes.map(recipe => (
-              <Link href={`/dashboard/recipes/${recipe.id}`} key={recipe.id} style={{ textDecoration: 'none' }}>
-                <Card.Root 
-                  variant="outline" 
-                  bg="white" 
-                  borderRadius="2xl"
-                  overflow="hidden"
-                  transition="all 0.3s ease"
-                  _hover={{
-                    boxShadow: 'lg',
-                    transform: 'translateY(-4px)',
-                    borderColor: 'orange.300'
-                  }}
-                  h="full"
-                >
-                  <Card.Body p={6}>
-                    <Stack gap={4} h="full">
-                      <Stack gap={2}>
-                        <HStack justify="space-between" align="start">
-                          <Heading size="md" color="gray.800" lineClamp={2}>
-                            {recipe.title}
-                          </Heading>
-                          {recipe.isComplete === false && (
-                            <Badge 
-                              bg="yellow.100" 
-                              color="yellow.700" 
-                              fontSize="xs"
-                              px={2}
-                              py={1}
-                              borderRadius="md"
-                              display="flex"
-                              alignItems="center"
-                              gap={1}
-                              flexShrink={0}
-                            >
-                              <AlertTriangle size={12} />
-                              לא מושלם
-                            </Badge>
-                          )}
-                        </HStack>
-                        {recipe.description && (
-                          <Text color="gray.500" fontSize="sm" lineClamp={2}>
-                            {recipe.description}
-                          </Text>
-                        )}
-                      </Stack>
-
-                      <HStack gap={4} fontSize="sm" color="gray.600">
-                        <HStack gap={1}>
-                          <Users size={16} />
-                          <Text>{recipe.servings} מנות</Text>
-                        </HStack>
-                        {recipe.cookTime && (
-                          <HStack gap={1}>
-                            <Clock size={16} />
-                            <Text>{recipe.cookTime} דקות</Text>
+            {displayedRecipes.map(recipe => (
+              <Box key={recipe.id} position="relative">
+                <Link href={`/dashboard/recipes/${recipe.id}`} style={{ textDecoration: 'none' }}>
+                  <Card.Root 
+                    variant="outline" 
+                    bg="white" 
+                    borderRadius="2xl"
+                    overflow="hidden"
+                    transition="all 0.3s ease"
+                    _hover={{
+                      boxShadow: 'lg',
+                      transform: 'translateY(-4px)',
+                      borderColor: 'orange.300'
+                    }}
+                    h="full"
+                  >
+                    <Card.Body p={6}>
+                      <Stack gap={4} h="full">
+                        <Stack gap={2}>
+                          <HStack justify="space-between" align="start">
+                            <Heading size="md" color="gray.800" lineClamp={2}>
+                              {recipe.title}
+                            </Heading>
+                            <HStack gap={1} flexShrink={0}>
+                              {recipe.isPublic ? (
+                                <Badge bg="green.100" color="green.700" fontSize="xs" px={2} py={1} borderRadius="md">
+                                  <Globe size={12} style={{ marginLeft: '4px' }} />
+                                  ציבורי
+                                </Badge>
+                              ) : (
+                                <Badge bg="gray.100" color="gray.600" fontSize="xs" px={2} py={1} borderRadius="md">
+                                  <Lock size={12} style={{ marginLeft: '4px' }} />
+                                  פרטי
+                                </Badge>
+                              )}
+                              {recipe.isComplete === false && (
+                                <Badge 
+                                  bg="yellow.100" 
+                                  color="yellow.700" 
+                                  fontSize="xs"
+                                  px={2}
+                                  py={1}
+                                  borderRadius="md"
+                                  display="flex"
+                                  alignItems="center"
+                                  gap={1}
+                                >
+                                  <AlertTriangle size={12} />
+                                  לא מושלם
+                                </Badge>
+                              )}
+                            </HStack>
                           </HStack>
-                        )}
-                      </HStack>
+                          {recipe.description && (
+                            <Text color="gray.500" fontSize="sm" lineClamp={2}>
+                              {recipe.description}
+                            </Text>
+                          )}
+                        </Stack>
 
-                      <Stack gap={2} mt="auto">
-                        <Text color="gray.500" fontSize="xs">
-                          {recipe.recipeIngredients.length} מרכיבים
-                        </Text>
-                        <HStack gap={2} flexWrap="wrap">
-                          {recipe.recipeIngredients.slice(0, 3).map((ing, idx) => (
-                            <Badge key={idx} bg="orange.50" color="orange.600" fontSize="xs">
-                              {ing.ingredient.name}
-                            </Badge>
-                          ))}
-                          {recipe.recipeIngredients.length > 3 && (
-                            <Badge bg="gray.100" color="gray.600" fontSize="xs">
-                              +{recipe.recipeIngredients.length - 3} עוד
-                            </Badge>
+                        <HStack gap={4} fontSize="sm" color="gray.600">
+                          <HStack gap={1}>
+                            <Users size={16} />
+                            <Text>{recipe.servings} מנות</Text>
+                          </HStack>
+                          {recipe.cookTime && (
+                            <HStack gap={1}>
+                              <Clock size={16} />
+                              <Text>{recipe.cookTime} דקות</Text>
+                            </HStack>
                           )}
                         </HStack>
+
+                        <Stack gap={2} mt="auto">
+                          <Text color="gray.500" fontSize="xs">
+                            {recipe.recipeIngredients.length} מרכיבים
+                          </Text>
+                          <HStack gap={2} flexWrap="wrap">
+                            {recipe.recipeIngredients.slice(0, 3).map((ing, idx) => (
+                              <Badge key={idx} bg="orange.50" color="orange.600" fontSize="xs">
+                                {ing.ingredient.name}
+                              </Badge>
+                            ))}
+                            {recipe.recipeIngredients.length > 3 && (
+                              <Badge bg="gray.100" color="gray.600" fontSize="xs">
+                                +{recipe.recipeIngredients.length - 3} עוד
+                              </Badge>
+                            )}
+                          </HStack>
+                        </Stack>
                       </Stack>
-                    </Stack>
-                  </Card.Body>
-                </Card.Root>
-              </Link>
+                    </Card.Body>
+                  </Card.Root>
+                </Link>
+                
+                {/* Publish/Unpublish button - only for owner */}
+                {recipe.userId === currentUserId && (
+                  <Button
+                    position="absolute"
+                    top={3}
+                    left={3}
+                    size="sm"
+                    variant={recipe.isPublic ? 'outline' : 'solid'}
+                    bg={recipe.isPublic ? 'white' : 'green.500'}
+                    color={recipe.isPublic ? 'gray.600' : 'white'}
+                    borderColor={recipe.isPublic ? 'gray.300' : undefined}
+                    _hover={{ 
+                      bg: recipe.isPublic ? 'gray.100' : 'green.600',
+                      transform: 'scale(1.05)'
+                    }}
+                    borderRadius="lg"
+                    boxShadow="md"
+                    onClick={(e) => togglePublish(e, recipe.id, recipe.isPublic || false)}
+                  >
+                    {recipe.isPublic ? (
+                      <>
+                        <Lock size={14} style={{ marginLeft: '4px' }} />
+                        הפוך לפרטי
+                      </>
+                    ) : (
+                      <>
+                        <Globe size={14} style={{ marginLeft: '4px' }} />
+                        פרסם
+                      </>
+                    )}
+                  </Button>
+                )}
+              </Box>
             ))}
           </SimpleGrid>
         )}
@@ -243,6 +354,36 @@ function StatItem({ icon: Icon, label, count, color }: any) {
         <Text fontSize="xs" color="gray.500" fontWeight="medium">{label}</Text>
       </Stack>
     </HStack>
+  );
+}
+
+function EmptyPublicState() {
+  return (
+    <Card.Root 
+      variant="outline" 
+      bg="white" 
+      borderRadius="3xl" 
+      borderStyle="dashed"
+      borderWidth="2px"
+      borderColor="gray.300"
+      maxW="xl"
+      w="full"
+      boxShadow="none"
+    >
+      <Card.Body p={{ base: 8, md: 16 }}>
+        <Stack gap={8} align="center" textAlign="center">
+          <Center bg="green.50" w="100px" h="100px" borderRadius="full">
+            <Globe size={50} color="#22c55e" strokeWidth={1.5} />
+          </Center>
+          <Stack gap={3}>
+            <Heading size="lg" fontWeight="bold" color="gray.800">אין עדיין מתכונים ציבוריים</Heading>
+            <Text color="gray.500" fontSize="lg">
+              כשמישהו יפרסם מתכון, הוא יופיע כאן לכולם.
+            </Text>
+          </Stack>
+        </Stack>
+      </Card.Body>
+    </Card.Root>
   );
 }
 
