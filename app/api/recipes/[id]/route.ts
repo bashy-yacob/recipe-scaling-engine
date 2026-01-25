@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { getRecipeById } from '@/lib/recipes/read';
 import { updateRecipe, updateRecipeIngredients, updateRecipeInstructions } from '@/lib/recipes/update';
 import { deleteRecipe } from '@/lib/recipes/delete';
+import { auth } from '@/lib/auth';
 
 export async function GET(
   request: Request,
@@ -11,10 +12,13 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const recipe = await getRecipeById(id);
+    const session = await auth();
+    const viewerId = session?.user?.id;
+
+    const recipe = await getRecipeById(id, viewerId);
 
     if (!recipe) {
-      return Response.json({ error: 'Recipe not found' }, { status: 404 });
+      return Response.json({ error: 'מתכון לא נמצא או לא נגיש' }, { status: 404 });
     }
 
     return Response.json(recipe);
@@ -29,8 +33,17 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return Response.json({ error: 'לא מחובר' }, { status: 401 });
+    }
+
     const { id } = await params;
     const body = await request.json();
+
+    const existing = await db.recipe.findUnique({ where: { id } });
+    if (!existing) return Response.json({ error: 'מתכון לא נמצא' }, { status: 404 });
+    if (existing.userId !== session.user.id) return Response.json({ error: 'אין הרשאה' }, { status: 403 });
 
     // Update basic recipe info
     let recipe = await updateRecipe(id, {
@@ -40,6 +53,7 @@ export async function PUT(
       prepTime: body.prepTime,
       cookTime: body.cookTime,
       isComplete: body.isComplete,
+      isPublic: body.isPublic,
     });
 
     // Update ingredients if provided
@@ -64,7 +78,17 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return Response.json({ error: 'לא מחובר' }, { status: 401 });
+    }
+
     const { id } = await params;
+
+    const existing = await db.recipe.findUnique({ where: { id } });
+    if (!existing) return Response.json({ error: 'מתכון לא נמצא' }, { status: 404 });
+    if (existing.userId !== session.user.id) return Response.json({ error: 'אין הרשאה' }, { status: 403 });
+
     await deleteRecipe(id);
 
     return Response.json({ message: 'Recipe deleted' });

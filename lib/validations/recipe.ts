@@ -22,6 +22,7 @@ export const recipeSchema = z.object({
   ingredients: z.array(ingredientSchema).min(1, 'צריך לפחות מרכיב אחד'),
   instructions: z.array(instructionSchema).optional().default([]),
   isComplete: z.boolean().optional().default(true),
+  isPublic: z.boolean().optional().default(false),
 });
 
 export type Ingredient = z.infer<typeof ingredientSchema>;

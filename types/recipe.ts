@@ -23,6 +23,7 @@ export interface Recipe {
   instructions: Instruction[];
   cookTime: number;
   prepTime: number;
+  isPublic?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

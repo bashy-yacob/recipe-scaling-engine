@@ -11,6 +11,7 @@ export interface UpdateRecipeInput {
   rating?: number;
   notes?: string;
   isComplete?: boolean;
+  isPublic?: boolean;
 }
 
 /**
@@ -28,6 +29,7 @@ export async function updateRecipe(recipeId: string, input: UpdateRecipeInput) {
     if (input.rating !== undefined) updateData.rating = input.rating;
     if (input.notes) updateData.notes = input.notes;
     if (input.isComplete !== undefined) updateData.isComplete = input.isComplete;
+      if (input.isPublic !== undefined) updateData.isPublic = input.isPublic;
 
     // Calculate total time if prep or cook time changed
     if (input.prepTime !== undefined || input.cookTime !== undefined) {

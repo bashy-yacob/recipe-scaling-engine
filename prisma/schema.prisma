@@ -98,6 +98,7 @@ model Recipe {
   timesCooked Int      @default(0)
   lastCookedAt DateTime?
   isComplete  Boolean  @default(true) // false if missing amounts or other required fields
+  isPublic    Boolean  @default(false)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

@@ -12,6 +12,7 @@ export interface CreateRecipeInput {
   prepTime?: number;
   cookTime?: number;
   isComplete?: boolean;
+  isPublic?: boolean;
   ingredients: Array<{
     name: string;
     amount: number | null;
@@ -70,6 +71,7 @@ export async function createRecipe(input: CreateRecipeInput) {
         cookTime: validated.cookTime,
         totalTime: (validated.prepTime || 0) + (validated.cookTime || 0),
         isComplete: input.isComplete ?? true,
+        isPublic: input.isPublic ?? false,
         
         // Create recipe ingredients
         recipeIngredients: {

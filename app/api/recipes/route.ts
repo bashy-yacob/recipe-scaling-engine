@@ -2,20 +2,25 @@
 
 import { db } from '@/lib/db';
 import { createRecipe } from '@/lib/recipes/create';
-import { getUserRecipes } from '@/lib/recipes/read';
+import { auth } from '@/lib/auth';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    // For now, we'll use a hardcoded user ID from the seed
-    const userId = 'demo-user-from-seed'; // We'll fetch the actual user ID
-    
-    // Get the first user (demo user)
-    const user = await db.user.findFirst();
-    if (!user) {
-      return Response.json({ error: 'User not found' }, { status: 404 });
-    }
+    const session = await auth();
+    const userId = session?.user?.id;
 
-    const recipes = await getUserRecipes(user.id);
+    // Return recipes that are public or belong to the current user
+    const recipes = await db.recipe.findMany({
+      where: userId
+        ? { OR: [{ isPublic: true }, { userId }] }
+        : { isPublic: true },
+      include: {
+        recipeIngredients: { include: { ingredient: true } },
+        instructions: { orderBy: { stepNumber: 'asc' } },
+        user: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
     return Response.json(recipes);
   } catch (error) {
     console.error('Error fetching recipes:', error);
@@ -25,16 +30,15 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-
-    // Get the first user (demo user)
-    const user = await db.user.findFirst();
-    if (!user) {
-      return Response.json({ error: 'User not found' }, { status: 404 });
+    const session = await auth();
+    if (!session?.user?.id) {
+      return Response.json({ error: 'לא מחובר' }, { status: 401 });
     }
 
+    const body = await request.json();
+
     const recipe = await createRecipe({
-      userId: user.id,
+      userId: session.user.id,
       ...body,
     });
 

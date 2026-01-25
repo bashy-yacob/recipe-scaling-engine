@@ -36,10 +36,17 @@ export async function getUserRecipes(userId: string) {
 /**
  * Get a single recipe by ID
  */
-export async function getRecipeById(recipeId: string) {
+export async function getRecipeById(recipeId: string, viewerId?: string) {
   try {
-    const recipe = await db.recipe.findUnique({
-      where: { id: recipeId },
+    const whereClause = viewerId
+      ? {
+          id: recipeId,
+          OR: [{ isPublic: true }, { userId: viewerId }],
+        }
+      : { id: recipeId, isPublic: true };
+
+    const recipe = await db.recipe.findFirst({
+      where: whereClause,
       include: {
         recipeIngredients: {
           include: {
@@ -68,7 +75,10 @@ export async function getRecipesByTag(userId: string, tagName: string) {
   try {
     const recipes = await db.recipe.findMany({
       where: {
-        userId,
+        OR: [
+          { isPublic: true },
+          { userId },
+        ],
         tags: {
           some: {
             tag: {
@@ -108,10 +118,17 @@ export async function searchRecipes(userId: string, query: string) {
   try {
     const recipes = await db.recipe.findMany({
       where: {
-        userId,
         OR: [
-          { title: { contains: query } },
-          { description: { contains: query } },
+          { isPublic: true },
+          { userId },
+        ],
+        AND: [
+          {
+            OR: [
+              { title: { contains: query } },
+              { description: { contains: query } },
+            ],
+          },
         ],
       },
       include: {
