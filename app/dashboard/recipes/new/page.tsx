@@ -253,51 +253,78 @@ export default function NewRecipePage() {
               variant="outline" 
               width="full" 
               height="auto" 
-              py={6}
+              py={8}
+              borderWidth={2}
               borderStyle="dashed"
-              borderColor="purple.300"
-              color="purple.600"
-              _hover={{ bg: 'purple.50' }}
+              borderColor="orange.300"
+              color="orange.700"
+              bg="orange.50"
+              _hover={{ bg: 'orange.100', borderColor: 'orange.400', transform: 'translateY(-2px)' }}
+              transition="all 0.2s"
+              rounded="xl"
             >
-              <Stack align="center" gap={2}>
-                <Sparkles size={24} />
-                <Text fontWeight="medium">יש לך טקסט ארוך? לחץ כאן להדבקה ובינה מלאכותית תסדר את המתכון</Text>
+              <Stack align="center" gap={3}>
+                <Box p={3} bg="white" rounded="full" shadow="sm" color="orange.500">
+                  <Sparkles size={24} />
+                </Box>
+                <Stack gap={0} textAlign="center">
+                  <Text fontWeight="bold" fontSize="lg">יבוא חכם של מתכון</Text>
+                  <Text fontSize="sm" color="orange.800">יש לך טקסט ארוך? הדבק אותו כאן וה-AI יסדר אותו אוטומטית</Text>
+                </Stack>
               </Stack>
             </Button>
           ) : (
-            <Card.Root variant="elevated" borderColor="purple.200" borderWidth={1}>
-              <Card.Header display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
-                <HStack gap={2} color="purple.600">
-                  <Sparkles size={20} />
-                  <Heading size="sm">יבוא חכם באמצעות AI</Heading>
+            <Card.Root variant="subtle" bg="orange.50" borderColor="orange.200" borderWidth={1} shadow="sm" rounded="xl" overflow="hidden">
+              <Card.Header bg="white" borderBottomWidth={1} borderColor="orange.100" py={4}>
+                <HStack justify="space-between" align="center">
+                  <HStack gap={3}>
+                    <Box p={2} bg="orange.100" rounded="md" color="orange.600">
+                      <Sparkles size={18} />
+                    </Box>
+                    <Stack gap={0}>
+                      <Heading size="sm" color="orange.800">יבוא חכם באמצעות AI</Heading>
+                      <Text fontSize="xs" color="gray.500">הדבק את הטקסט, אנחנו נעשה את השאר</Text>
+                    </Stack>
+                  </HStack>
+                  <IconButton 
+                    aria-label="סגור" 
+                    variant="ghost" 
+                    size="sm" 
+                    colorPalette="gray"
+                    onClick={() => setIsPasteOpen(false)}
+                    rounded="full"
+                  >
+                    <X size={18} />
+                  </IconButton>
                 </HStack>
-                <IconButton 
-                  aria-label="Close" 
-                  variant="ghost" 
-                  size="xs" 
-                  onClick={() => setIsPasteOpen(false)}
-                >
-                  <X size={16} />
-                </IconButton>
               </Card.Header>
-              <Card.Body>
+              <Card.Body bg="white/50" p={6}>
                 <Textarea 
-                  placeholder="הדבק כאן את המתכון המלא (למשל: 'עוגת שוקולד: לערבב 2 כוסות קמח...')"
+                  placeholder="לדוגמה: עוגת שוקולד: לערבב 2 כוסות קמח, כוס סוכר וכפית אבקת אפייה..."
                   value={pastedText}
                   onChange={(e) => setPastedText(e.target.value)}
                   minH="200px"
-                  mb={4}
+                  mb={6}
                   bg="white"
+                  borderColor="orange.200"
+                  _focus={{ borderColor: 'orange.500', ring: 2, ringColor: 'orange.100' }}
+                  fontSize="md"
+                  p={4}
+                  rounded="lg"
                 />
                 <Button 
-                  bg="purple.600"
+                  size="xl"
+                  width="full"
+                  bg="orange.500"
                   color="white"
-                  _hover={{ bg: 'purple.700' }}
+                  _hover={{ bg: "orange.600", shadow: "md" }}
                   onClick={handleParse} 
                   loading={isParsing}
-                  width="full"
+                  rounded="lg"
+                  fontWeight="bold"
                 >
-                 <Sparkles size={18} style={{ marginLeft: '8px' }} /> נתח וסדר את המתכון
+                 <Sparkles size={20} style={{ marginLeft: '8px' }} /> 
+                 {isParsing ? 'מפענח מתכון...' : 'נתח וסדר את המתכון'}
                 </Button>
               </Card.Body>
             </Card.Root>
