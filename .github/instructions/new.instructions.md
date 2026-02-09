@@ -1,17 +1,7 @@
 ---
 applyTo: "**"
 ---
-# Recipe Manager Project - Custom Instructions
 
-## Project Overview
-This is a Recipe Manager application built with React and TypeScript. The app allows users to create, edit, view, and manage cooking recipes with ingredients, instructions, and metadata.
-
-## Technology Stack
-- React 18+ with TypeScript
-- React Router for navigation
-- Tailwind CSS for styling---
-applyTo: "**"
----
 # Recipe Scaling Engine - Instructions
 
 ## Stack
