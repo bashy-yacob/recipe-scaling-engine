@@ -13,8 +13,11 @@ import {
   Stack,
   Separator,
 } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
 import { Settings, User, Scale, Save, Check } from 'lucide-react';
 import { toaster } from '@/components/ui/toaster';
+
+const MotionBox = motion.create(Box);
 
 export function SettingsPage() {
   
@@ -51,81 +54,86 @@ export function SettingsPage() {
   };
 
   return (
-    <Box minH="100vh" bg="gray.50" dir="rtl" w="100%">
+    <Box minH="100vh" bg="bg.page" dir="rtl" w="100%">
       {/* Header Section */}
-      <Box bg="white" borderBottom="1px" borderColor="gray.200" boxShadow="sm" w="100%">
-        <Container maxW="5xl" mx="auto" py={10} px={6}>
-          <HStack gap={6} align="center">
-            <Box bg="orange.100" p={4} borderRadius="2xl">
-              <Settings size={32} color="#ea580c" />
-            </Box>
-            <Stack gap={1}>
-              <Heading size="2xl" fontWeight="extrabold" color="gray.900">
-                הגדרות
-              </Heading>
-              <Text color="gray.500" fontSize="lg">
-                ניהול פרופיל והעדפות אישיות
-              </Text>
-            </Stack>
-          </HStack>
+      <Box bg="bg.surface" borderBottom="1px solid" borderColor="border.muted" w="100%">
+        <Container maxW="4xl" mx="auto" py={6} px={4}>
+          <MotionBox initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+            <HStack gap={4} align="center">
+              <Box bg="bg.brand.subtle" p={3} borderRadius="lg">
+                <Settings size={24} color="var(--chakra-colors-brand-500)" />
+              </Box>
+              <Stack gap={0.5}>
+                <Heading size="xl" fontWeight="bold" color="fg.heading">
+                  הגדרות
+                </Heading>
+                <Text color="fg.muted" fontSize="sm">
+                  ניהול פרופיל והעדפות אישיות
+                </Text>
+              </Stack>
+            </HStack>
+          </MotionBox>
         </Container>
       </Box>
 
       {/* Main Content */}
-      <Container maxW="5xl" mx="auto" py={12} px={6}>
-        <Card.Root variant="elevated" borderRadius="2xl" boxShadow="sm" overflow="hidden" bg="white">
-          <Card.Body p={{ base: 6, md: 10 }}>
-            <Stack gap={10} separator={<Separator borderColor="gray.100" />}>
+      <Container maxW="4xl" mx="auto" py={8} px={4}>
+        <Card.Root variant="outline" borderColor="border.default" bg="bg.surface" borderRadius="xl">
+          <Card.Body p={{ base: 5, md: 8 }}>
+            <Stack gap={8} separator={<Separator borderColor="border.muted" />}>
               
               {/* Profile Section */}
-              <Stack gap={6}>
-                <HStack gap={3}>
-                  <User size={20} color="#f97316" />
-                  <Heading size="md">פרטים אישיים</Heading>
+              <Stack gap={5}>
+                <HStack gap={2}>
+                  <User size={18} color="var(--chakra-colors-brand-500)" />
+                  <Heading size="sm" color="fg.heading">פרטים אישיים</Heading>
                 </HStack>
                 <Box maxW="md">
-                  <Text mb={2} fontWeight="medium" fontSize="sm" color="gray.700">שם מלא</Text>
+                  <Text mb={1.5} fontWeight="medium" fontSize="sm" color="fg.default">שם מלא</Text>
                   <Input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="השם שלך"
-                    size="lg"
-                    borderRadius="xl"
-                    bg="gray.50"
-                    border="0"
-                    _focus={{ bg: 'white', ring: 2, ringColor: 'orange.500' }}
+                    borderRadius="lg"
+                    borderColor="border.default"
                   />
-                  <Text fontSize="xs" color="gray.400" mt={2}>
+                  <Text fontSize="xs" color="fg.subtle" mt={1.5}>
                     השם שיופיע באפליקציה ובמתכונים שלך
                   </Text>
                 </Box>
               </Stack>
 
               {/* Preferences Section */}
-              <Stack gap={6}>
-                <HStack gap={3}>
-                  <Scale size={20} color="#f97316" />
-                  <Heading size="md">העדפות מדידה</Heading>
+              <Stack gap={5}>
+                <HStack gap={2}>
+                  <Scale size={18} color="var(--chakra-colors-brand-500)" />
+                  <Heading size="sm" color="fg.heading">העדפות מדידה</Heading>
                 </HStack>
                 
                 <Box maxW="md">
-                  <Text mb={2} fontWeight="medium" fontSize="sm" color="gray.700">מערכת מידות</Text>
-                  <HStack gap={3}>
+                  <Text mb={1.5} fontWeight="medium" fontSize="sm" color="fg.default">מערכת מידות</Text>
+                  <HStack gap={2}>
                     <Button
                       flex={1}
                       variant={preferredSystem === 'metric' ? 'solid' : 'outline'}
-                      colorPalette={preferredSystem === 'metric' ? 'orange' : 'gray'}
+                      bg={preferredSystem === 'metric' ? 'btn.primary.bg' : undefined}
+                      color={preferredSystem === 'metric' ? 'btn.primary.fg' : 'fg.default'}
+                      borderColor={preferredSystem !== 'metric' ? 'border.default' : undefined}
                       onClick={() => setPreferredSystem('metric')}
-                      borderRadius="xl"
+                      borderRadius="lg"
+                      size="sm"
                     >
                       מטרי (גרם, מ"ל)
                     </Button>
                     <Button
                       flex={1}
                       variant={preferredSystem === 'imperial' ? 'solid' : 'outline'}
-                      colorPalette={preferredSystem === 'imperial' ? 'orange' : 'gray'}
+                      bg={preferredSystem === 'imperial' ? 'btn.primary.bg' : undefined}
+                      color={preferredSystem === 'imperial' ? 'btn.primary.fg' : 'fg.default'}
+                      borderColor={preferredSystem !== 'imperial' ? 'border.default' : undefined}
                       onClick={() => setPreferredSystem('imperial')}
-                      borderRadius="xl"
+                      borderRadius="lg"
+                      size="sm"
                     >
                       אימפריאלי (cups, oz)
                     </Button>
@@ -133,23 +141,29 @@ export function SettingsPage() {
                 </Box>
 
                 <Box maxW="md">
-                  <Text mb={2} fontWeight="medium" fontSize="sm" color="gray.700">שפה</Text>
-                  <HStack gap={3}>
+                  <Text mb={1.5} fontWeight="medium" fontSize="sm" color="fg.default">שפה</Text>
+                  <HStack gap={2}>
                     <Button
                       flex={1}
                       variant={language === 'he' ? 'solid' : 'outline'}
-                      colorPalette={language === 'he' ? 'orange' : 'gray'}
+                      bg={language === 'he' ? 'btn.primary.bg' : undefined}
+                      color={language === 'he' ? 'btn.primary.fg' : 'fg.default'}
+                      borderColor={language !== 'he' ? 'border.default' : undefined}
                       onClick={() => setLanguage('he')}
-                      borderRadius="xl"
+                      borderRadius="lg"
+                      size="sm"
                     >
                       עברית
                     </Button>
                     <Button
                       flex={1}
                       variant={language === 'en' ? 'solid' : 'outline'}
-                      colorPalette={language === 'en' ? 'orange' : 'gray'}
+                      bg={language === 'en' ? 'btn.primary.bg' : undefined}
+                      color={language === 'en' ? 'btn.primary.fg' : 'fg.default'}
+                      borderColor={language !== 'en' ? 'border.default' : undefined}
                       onClick={() => setLanguage('en')}
-                      borderRadius="xl"
+                      borderRadius="lg"
+                      size="sm"
                     >
                       English
                     </Button>
@@ -160,25 +174,24 @@ export function SettingsPage() {
               {/* Save Button */}
               <Box>
                 <Button
-                  bg={isSaved ? 'green.500' : 'orange.500'}
-                  color="white"
-                  size="lg"
-                  borderRadius="xl"
-                  px={8}
+                  bg={isSaved ? 'green.500' : 'btn.primary.bg'}
+                  color="btn.primary.fg"
+                  borderRadius="lg"
+                  px={6}
                   onClick={handleSave}
                   loading={isLoading}
                   loadingText="שומר..."
-                  _hover={{ bg: isSaved ? 'green.600' : 'orange.600' }}
+                  _hover={{ bg: isSaved ? 'green.600' : 'btn.primary.hover' }}
                 >
                   {isSaved ? (
                     <>
-                      <Check size={20} style={{ marginLeft: '8px' }} />
-                      נשמר!
+                      <Check size={18} />
+                      <Text ms={1}>נשמר!</Text>
                     </>
                   ) : (
                     <>
-                      <Save size={20} style={{ marginLeft: '8px' }} />
-                      שמור שינויים
+                      <Save size={18} />
+                      <Text ms={1}>שמור שינויים</Text>
                     </>
                   )}
                 </Button>

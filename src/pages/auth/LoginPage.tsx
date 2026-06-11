@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Box, Button, Input, Text, VStack, Heading, Card, Stack } from '@chakra-ui/react';
 import { Mail, Lock, ChefHat, Chrome } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { ROUTES } from '@/router';
 import { toaster } from '@/components/ui/toaster';
+
+const MotionBox = motion.create(Box);
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -24,8 +27,6 @@ export function LoginPage() {
     setErrorMessage('');
 
     try {
-      // TODO: Implement actual authentication
-      // For now, simulate login
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toaster.create({ title: 'התחברת בהצלחה!', type: 'success' });
@@ -38,135 +39,141 @@ export function LoginPage() {
   };
 
   const handleGoogleSignIn = () => {
-    // TODO: Implement Google OAuth
     toaster.create({ title: 'התחברות עם Google תתווסף בקרוב', type: 'info' });
   };
 
   return (
-    <Box minH="100vh" bg="orange.50/30" display="flex" alignItems="center" justifyContent="center" p={4} dir="rtl">
-      <Stack gap={8} align="center" w="full" maxW="md">
-        
-        {/* Logo Section */}
-        <Stack align="center" gap={4}>
-          <Box
-            bg="orange.500"
-            p={4}
-            borderRadius="2xl"
-            boxShadow="lg"
-            transform="rotate(-5deg)"
-          >
-            <ChefHat size={40} color="white" strokeWidth={1.5} />
-          </Box>
-          <Heading size="2xl" fontWeight="extrabold" color="gray.800">
-            Recipe Scaling
-          </Heading>
-        </Stack>
+    <Box minH="100vh" bg="bg.page" display="flex" alignItems="center" justifyContent="center" p={4} dir="rtl">
+      <MotionBox
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        w="full"
+        maxW="md"
+      >
+        <Stack gap={6} align="center">
+          {/* Logo */}
+          <Stack align="center" gap={3}>
+            <Box bg="brand.500" p={3} borderRadius="xl">
+              <ChefHat size={32} color="white" strokeWidth={1.5} />
+            </Box>
+            <Heading size="xl" fontWeight="extrabold" color="fg.heading">
+              Recipe Scaling
+            </Heading>
+          </Stack>
 
-        <Card.Root variant="elevated" w="full" borderRadius="3xl" boxShadow="xl" bg="white" overflow="hidden">
-          <Card.Body p={8}>
-            <VStack gap={6}>
-              <VStack gap={2} align="center" textAlign="center">
-                <Heading size="lg" fontWeight="bold">התחברות</Heading>
-                <Text color="gray.500">הזינו פרטים כדי להתחבר לחשבון</Text>
-              </VStack>
-
-              {errorMessage && (
-                <Box w="full" p={3} bg="red.50" borderRadius="xl" borderWidth={1} borderColor="red.200">
-                  <Text color="red.600" textAlign="center" fontSize="sm" fontWeight="medium">{errorMessage}</Text>
-                </Box>
-              )}
-
-              <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-                <VStack gap={5} w="full">
-                  <Box w="full">
-                    <Text mb={2} fontWeight="bold" fontSize="sm" color="gray.700">אימייל</Text>
-                    <Box position="relative">
-                      <Box position="absolute" right={3} top="50%" transform="translateY(-50%)" zIndex={2} color="gray.400">
-                        <Mail size={18} />
-                      </Box>
-                      <Input
-                        type="email"
-                        placeholder="your@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        pr={10}
-                        pl={4}
-                        required
-                        dir="ltr"
-                        size="lg"
-                        borderRadius="xl"
-                        bg="gray.50"
-                        _focus={{ bg: 'white', borderColor: 'orange.500' }}
-                      />
-                    </Box>
-                  </Box>
-
-                  <Box w="full">
-                    <Text mb={2} fontWeight="bold" fontSize="sm" color="gray.700">סיסמה</Text>
-                    <Box position="relative">
-                      <Box position="absolute" right={3} top="50%" transform="translateY(-50%)" zIndex={2} color="gray.400">
-                        <Lock size={18} />
-                      </Box>
-                      <Input
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        pr={10}
-                        pl={4}
-                        required
-                        dir="ltr"
-                        size="lg"
-                        borderRadius="xl"
-                        bg="gray.50"
-                        _focus={{ bg: 'white', borderColor: 'orange.500' }}
-                      />
-                    </Box>
-                  </Box>
-
-                  <Button
-                    type="submit"
-                    w="full"
-                    bg="orange.500"
-                    color="white"
-                    size="lg"
-                    borderRadius="xl"
-                    _hover={{ bg: 'orange.600' }}
-                    loading={isLoading}
-                    loadingText="מתחבר..."
-                  >
-                    התחבר
-                  </Button>
+          <Card.Root variant="outline" w="full" borderRadius="xl" borderColor="border.default" bg="bg.surface" overflow="hidden">
+            <Card.Body p={{ base: 6, md: 8 }}>
+              <VStack gap={5}>
+                <VStack gap={1} align="center" textAlign="center">
+                  <Heading size="lg" fontWeight="bold" color="fg.heading">התחברות</Heading>
+                  <Text color="fg.muted" fontSize="sm">הזינו פרטים כדי להתחבר לחשבון</Text>
                 </VStack>
-              </form>
 
-              <Box w="full" textAlign="center">
-                <Text color="gray.400" fontSize="sm">או</Text>
-              </Box>
+                {errorMessage && (
+                  <Box w="full" p={3} bg="red.50" borderRadius="lg" borderWidth={1} borderColor="red.200">
+                    <Text color="red.600" textAlign="center" fontSize="sm">{errorMessage}</Text>
+                  </Box>
+                )}
 
-              <Button
-                w="full"
-                variant="outline"
-                size="lg"
-                borderRadius="xl"
-                onClick={handleGoogleSignIn}
-              >
-                <Chrome size={20} style={{ marginLeft: '8px' }} />
-                המשך עם Google
-              </Button>
+                <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+                  <VStack gap={4} w="full">
+                    <Box w="full">
+                      <Text mb={1.5} fontWeight="medium" fontSize="sm" color="fg.default">אימייל</Text>
+                      <Box position="relative">
+                        <Box position="absolute" right={3} top="50%" transform="translateY(-50%)" zIndex={2} color="fg.subtle">
+                          <Mail size={16} />
+                        </Box>
+                        <Input
+                          type="email"
+                          placeholder="your@email.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          pr={10}
+                          pl={4}
+                          required
+                          dir="ltr"
+                          size="lg"
+                          borderRadius="lg"
+                          bg="bg.subtle"
+                          borderColor="border.default"
+                          _focus={{ bg: 'bg.surface', borderColor: 'brand.500' }}
+                        />
+                      </Box>
+                    </Box>
 
-              <Text color="gray.500" fontSize="sm">
-                אין לך חשבון?{' '}
-                <Link to={ROUTES.REGISTER}>
-                  <Text as="span" color="orange.500" fontWeight="bold" _hover={{ textDecoration: 'underline' }}>
-                    הרשמה
-                  </Text>
-                </Link>
-              </Text>
-            </VStack>
-          </Card.Body>
-        </Card.Root>
-      </Stack>
+                    <Box w="full">
+                      <Text mb={1.5} fontWeight="medium" fontSize="sm" color="fg.default">סיסמה</Text>
+                      <Box position="relative">
+                        <Box position="absolute" right={3} top="50%" transform="translateY(-50%)" zIndex={2} color="fg.subtle">
+                          <Lock size={16} />
+                        </Box>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          pr={10}
+                          pl={4}
+                          required
+                          dir="ltr"
+                          size="lg"
+                          borderRadius="lg"
+                          bg="bg.subtle"
+                          borderColor="border.default"
+                          _focus={{ bg: 'bg.surface', borderColor: 'brand.500' }}
+                        />
+                      </Box>
+                    </Box>
+
+                    <Button
+                      type="submit"
+                      w="full"
+                      bg="btn.primary.bg"
+                      color="btn.primary.fg"
+                      size="lg"
+                      borderRadius="lg"
+                      _hover={{ bg: 'btn.primary.hover' }}
+                      loading={isLoading}
+                      loadingText="מתחבר..."
+                      fontWeight="semibold"
+                    >
+                      התחבר
+                    </Button>
+                  </VStack>
+                </form>
+
+                <Box w="full" textAlign="center">
+                  <Text color="fg.subtle" fontSize="xs">או</Text>
+                </Box>
+
+                <Button
+                  w="full"
+                  variant="outline"
+                  size="lg"
+                  borderRadius="lg"
+                  borderColor="border.default"
+                  onClick={handleGoogleSignIn}
+                  color="fg.default"
+                  _hover={{ bg: 'bg.muted' }}
+                >
+                  <Chrome size={18} />
+                  <Text ms={2}>המשך עם Google</Text>
+                </Button>
+
+                <Text color="fg.muted" fontSize="sm">
+                  אין לך חשבון?{' '}
+                  <Link to={ROUTES.REGISTER}>
+                    <Text as="span" color="fg.brand" fontWeight="semibold" _hover={{ textDecoration: 'underline' }}>
+                      הרשמה
+                    </Text>
+                  </Link>
+                </Text>
+              </VStack>
+            </Card.Body>
+          </Card.Root>
+        </Stack>
+      </MotionBox>
     </Box>
   );
 }

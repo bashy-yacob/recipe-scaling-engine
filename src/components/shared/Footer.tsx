@@ -3,108 +3,85 @@
 import {
   Box,
   Container,
-  SimpleGrid,
   Stack,
   Text,
   HStack,
-  Circle,
   Separator,
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { ChefHat, BookOpen, Plus, Layout, Github, Mail, Heart } from 'lucide-react';
+import { ChefHat, Heart } from 'lucide-react';
 import { ROUTES } from '@/router';
 
 export function Footer() {
   return (
-    <Box bg="white" borderTop="1px" borderColor="gray.100" pt={16} pb={8} dir="rtl">
+    <Box bg="bg.surface" borderTop="1px solid" borderColor="border.muted" pt={10} pb={6} dir="rtl">
       <Container maxW="5xl" mx="auto" px={6}>
-        <SimpleGrid columns={{ base: 1, md: 4 }} gap={12} mb={12}>
-          
-          {/* לוגו ותיאור קצר */}
-          <Stack gap={4} gridColumn={{ md: "span 1.5" }}>
-            <HStack gap={3}>
-              <Circle bg="orange.500" p={2} boxShadow="md">
-                <ChefHat size={24} color="white" />
-              </Circle>
-              <Text fontSize="xl" fontWeight="black" letterSpacing="tight">
-                Recipe <Text as="span" color="orange.500">Scaling</Text>
+        <HStack 
+          justify="space-between" 
+          align="start" 
+          flexWrap="wrap" 
+          gap={8} 
+          mb={8}
+        >
+          {/* לוגו ותיאור */}
+          <Stack gap={3} maxW="280px">
+            <HStack gap={2}>
+              <Box bg="brand.500" p={1.5} borderRadius="lg">
+                <ChefHat size={18} color="white" />
+              </Box>
+              <Text fontSize="md" fontWeight="extrabold" color="fg.heading">
+                Recipe <Text as="span" color="fg.brand">Scaling</Text>
               </Text>
             </HStack>
-            <Text color="gray.500" fontSize="sm" lineHeight="tall" maxW="300px">
-              מנוע חכם לניהול ושינוי כמויות במתכונים בצורה מקצועית, 
-              המותאם במיוחד לאופים ובשלנים שאוהבים דיוק.
+            <Text color="fg.muted" fontSize="sm" lineHeight="tall">
+              מנוע חכם לניהול ושינוי כמויות במתכונים, מותאם לאופים ובשלנים.
             </Text>
           </Stack>
 
-          {/* ניווט מהיר */}
-          <Stack gap={4}>
-            <Text fontWeight="bold" fontSize="md" color="gray.800">ניווט מהיר</Text>
-            <Stack gap={2}>
-              <FooterLink href={ROUTES.HOME} icon={ChefHat}>דף הבית</FooterLink>
-              <FooterLink href={ROUTES.RECIPES} icon={BookOpen}>המתכונים שלי</FooterLink>
-              <FooterLink href={ROUTES.RECIPE_NEW} icon={Plus}>הוספת מתכון</FooterLink>
-            </Stack>
+          {/* ניווט */}
+          <Stack gap={2}>
+            <Text fontWeight="semibold" fontSize="sm" color="fg.heading" mb={1}>ניווט</Text>
+            <FooterLink href={ROUTES.HOME}>דף הבית</FooterLink>
+            <FooterLink href={ROUTES.RECIPES}>המתכונים שלי</FooterLink>
+            <FooterLink href={ROUTES.RECIPE_NEW}>הוספת מתכון</FooterLink>
           </Stack>
 
-          {/* משאבים ופיתוח */}
-          <Stack gap={4}>
-            <Text fontWeight="bold" fontSize="md" color="gray.800">משאבים</Text>
-            <Stack gap={2}>
-              <FooterLink href={ROUTES.DEMO} icon={Layout}>ספריית רכיבים (Demo)</FooterLink>
-              <FooterLink href="#" icon={Github}>קוד פתוח</FooterLink>
-              <FooterLink href="#" icon={Mail}>צור קשר</FooterLink>
-            </Stack>
+          {/* משאבים */}
+          <Stack gap={2}>
+            <Text fontWeight="semibold" fontSize="sm" color="fg.heading" mb={1}>משאבים</Text>
+            <FooterLink href={ROUTES.DEMO}>ספריית רכיבים</FooterLink>
+            <FooterLink href="#">קוד פתוח</FooterLink>
           </Stack>
+        </HStack>
 
-        </SimpleGrid>
+        <Separator borderColor="border.muted" mb={6} />
 
-        <Separator borderColor="gray.100" mb={8} />
-
-        {/* שורת זכויות יוצרים תחתונה */}
-        <Stack 
-          direction={{ base: 'column', md: 'row' }} 
-          justify="space-between" 
-          align="center" 
-          gap={4}
-        >
-          <Text fontSize="xs" color="gray.400">
-            © {new Date().getFullYear()} Recipe Scaling Engine. כל הזכויות שמורות.
+        <HStack justify="space-between" flexWrap="wrap" gap={3}>
+          <Text fontSize="xs" color="fg.subtle">
+            © {new Date().getFullYear()} Recipe Scaling Engine
           </Text>
-          
-          <HStack gap={1} fontSize="xs" color="gray.400">
+          <HStack gap={1} fontSize="xs" color="fg.subtle">
             <Text>נבנה עם</Text>
-            <Heart size={12} color="#f97316" fill="#f97316" />
+            <Heart size={11} color="#f97316" fill="#f97316" />
             <Text>עבור בשלנים שאוהבים דיוק</Text>
           </HStack>
-
-          <HStack gap={4}>
-            <Text fontSize="xs" color="gray.400" fontWeight="bold">v2.0.0</Text>
-          </HStack>
-        </Stack>
+        </HStack>
       </Container>
     </Box>
   );
 }
 
-// קומפוננטת עזר לקישור בפוטר
-interface FooterLinkProps {
-  href: string;
-  children: React.ReactNode;
-  icon: React.ComponentType<{ size: number }>;
-}
-
-function FooterLink({ href, children, icon: Icon }: FooterLinkProps) {
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link to={href}>
-      <HStack 
-        gap={2} 
-        color="gray.500" 
-        transition="all 0.2s" 
-        _hover={{ color: 'orange.500', transform: 'translateX(-4px)' }}
+      <Text 
+        fontSize="sm" 
+        color="fg.muted" 
+        transition="color 0.15s" 
+        _hover={{ color: 'fg.brand' }}
       >
-        <Icon size={16} />
-        <Text fontSize="sm" fontWeight="medium">{children}</Text>
-      </HStack>
+        {children}
+      </Text>
     </Link>
   );
 }

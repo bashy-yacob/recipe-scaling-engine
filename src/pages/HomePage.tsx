@@ -11,108 +11,125 @@ import {
   HStack, 
   Card, 
   Center,
-  Circle
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { ChefHat, Scale, BookOpen, Sparkles, Check, Loader } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { ROUTES } from '@/router';
+
+const MotionBox = motion.create(Box);
+const MotionStack = motion.create(Stack);
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: 'easeOut' as const },
+  }),
+};
 
 export function HomePage() {
   return (
     <Box 
       minH="100vh" 
-      bg="orange.50/30" 
+      bg="bg.page" 
       dir="rtl" 
       w="100%"
       display="flex"
       flexDirection="column"
     >
-      <Container maxW="5xl" mx="auto" py={{ base: 12, md: 24 }} px={6}>
+      <Container maxW="5xl" mx="auto" py={{ base: 16, md: 28 }} px={6}>
         
-        {/* Hero Section - כותרת ראשית ממורכזת */}
-        <Stack gap={10} align="center" textAlign="center" mb={20}>
-          <Box
-            bg="orange.500"
-            p={5}
-            borderRadius="3xl"
-            boxShadow="2xl"
-            transform="rotate(-5deg)"
-          >
-            <ChefHat size={60} color="white" strokeWidth={1.5} />
-          </Box>
+        {/* Hero Section */}
+        <MotionStack
+          gap={8}
+          align="center"
+          textAlign="center"
+          mb={24}
+          initial="hidden"
+          animate="visible"
+        >
+          <MotionBox variants={fadeUp} custom={0}>
+            <Box
+              bg="brand.500"
+              p={4}
+              borderRadius="2xl"
+              display="inline-flex"
+            >
+              <ChefHat size={48} color="white" strokeWidth={1.5} />
+            </Box>
+          </MotionBox>
 
-          <Stack gap={4}>
+          <MotionStack gap={4} variants={fadeUp} custom={1}>
             <Heading
               size="4xl"
               fontWeight="extrabold"
               letterSpacing="tight"
-              color="gray.900"
+              color="fg.heading"
             >
               Recipe{' '}
-              <Text as="span" color="orange.500">Scaling</Text>{' '}
+              <Text as="span" color="fg.brand">Scaling</Text>{' '}
               Engine
             </Heading>
-            <Text fontSize="xl" color="gray.600" maxW="2xl" mx="auto" lineHeight="tall">
-              ספר המתכונים החכם שלך - עם אלגוריתמי scaling מתקדמים 
+            <Text fontSize="xl" color="fg.muted" maxW="lg" mx="auto" lineHeight="tall">
+              ספר המתכונים החכם שלך — עם אלגוריתמי scaling מתקדמים 
               שמבינים את הכימיה של האפייה והבישול.
             </Text>
-          </Stack>
+          </MotionStack>
 
-          <HStack gap={4} mt={4}>
+          <MotionBox variants={fadeUp} custom={2}>
             <Button
               asChild
               size="xl"
-              bg="orange.500"
-              color="white"
+              bg="btn.primary.bg"
+              color="btn.primary.fg"
               px={10}
-              h="64px"
-              borderRadius="2xl"
-              _hover={{ bg: 'orange.600', transform: 'translateY(-2px)' }}
-              boxShadow="xl"
+              h="56px"
+              borderRadius="xl"
+              _hover={{ bg: 'btn.primary.hover', transform: 'translateY(-1px)' }}
               transition="all 0.2s"
+              fontWeight="bold"
+              fontSize="lg"
             >
               <Link to={ROUTES.RECIPES}>
-                <HStack gap={3}>
-                  <ChefHat size={22} />
-                  <Text fontSize="lg" fontWeight="bold">התחילי לבשל</Text>
-                </HStack>
+                <ChefHat size={20} />
+                <Text ms={2}>התחילי לבשל</Text>
               </Link>
             </Button>
-          </HStack>
-        </Stack>
+          </MotionBox>
+        </MotionStack>
 
-        {/* Features Grid - 3 עמודות ממורכזות */}
-        <SimpleGrid columns={{ base: 1, md: 3 }} gap={8} mb={24}>
+        {/* Features Grid */}
+        <SimpleGrid columns={{ base: 1, md: 3 }} gap={6} mb={24}>
           <FeatureCard
-            icon={<Scale size={32} />}
+            icon={<Scale size={28} />}
             title="Smart Scaling"
-            description="שינוי כמויות חכם - לא רק הכפלה מתמטית, אלא התאמה לפי חוקי אפייה"
-            color="blue"
+            description="שינוי כמויות חכם — לא רק הכפלה מתמטית, אלא התאמה לפי חוקי אפייה"
+            index={0}
           />
           <FeatureCard
-            icon={<BookOpen size={32} />}
+            icon={<BookOpen size={28} />}
             title="ספר מתכונים אישי"
             description="ניהול מסודר עם תמונות, תגיות וחיפוש מהיר בכל רגע נתון"
-            color="purple"
+            index={1}
           />
           <FeatureCard
-            icon={<Sparkles size={32} />}
+            icon={<Sparkles size={28} />}
             title="AI מובנה"
             description="ייבוא מתכונים אוטומטי מתמונות, הודעות וואטסאפ או קישורי אינטרנט"
-            color="pink"
+            index={2}
           />
         </SimpleGrid>
 
-        {/* Status Card - סטטוס פרויקט ממורכז */}
+        {/* Status Card */}
         <Box maxW="2xl" mx="auto">
-          <Card.Root variant="elevated" borderRadius="3xl" overflow="hidden" boxShadow="sm">
-            <Card.Header bg="gray.50" px={8} py={5} borderBottomWidth="1px">
-              <HStack justify="space-between">
-                <Heading size="md">סטטוס פיתוח המערכת</Heading>
-              </HStack>
+          <Card.Root variant="outline" borderRadius="xl" overflow="hidden" borderColor="border.default" bg="bg.surface">
+            <Card.Header bg="bg.muted" px={6} py={4} borderBottomWidth="1px" borderColor="border.muted">
+              <Heading size="md" color="fg.heading">סטטוס פיתוח</Heading>
             </Card.Header>
-            <Card.Body px={8} py={8}>
-              <SimpleGrid columns={{ base: 1, sm: 2 }} gap={4}>
+            <Card.Body px={6} py={6}>
+              <SimpleGrid columns={{ base: 1, sm: 2 }} gap={3}>
                 <StatusItem completed text="תשתית פרויקט ו-DB" />
                 <StatusItem completed text="עיצוב ממשק Chakra v3" />
                 <StatusItem completed text="מיגרציה ל-Vite + React Router" />
@@ -124,8 +141,8 @@ export function HomePage() {
           </Card.Root>
         </Box>
 
-        <Center mt={12}>
-          <Text fontSize="sm" color="gray.400" fontWeight="medium">
+        <Center mt={10}>
+          <Text fontSize="sm" color="fg.subtle" fontWeight="medium">
             נבנה באהבה עבור בשלנים ואופים מקצועיים
           </Text>
         </Center>
@@ -135,43 +152,51 @@ export function HomePage() {
   );
 }
 
-// קומפוננטת כרטיס פיצ'ר
+// Feature Card
 interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
-  color: string;
+  index: number;
 }
 
-function FeatureCard({ icon, title, description, color }: FeatureCardProps) {
+function FeatureCard({ icon, title, description, index }: FeatureCardProps) {
   return (
-    <Card.Root 
-      variant="outline"
-      borderRadius="3xl" 
-      bg="white"
-      transition="all 0.3s"
-      _hover={{ transform: 'translateY(-8px)', boxShadow: '2xl', borderColor: `${color}.200` }}
-      borderWidth="1px"
-      borderColor="gray.100"
+    <MotionBox
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-40px' }}
+      variants={fadeUp}
+      custom={index}
     >
-      <Card.Body p={8}>
-        <Stack gap={5} align="start">
-          <Circle size="60px" bg={`${color}.50`} color={`${color}.500`}>
-            {icon}
-          </Circle>
-          <Stack gap={2}>
-            <Heading size="md" fontWeight="bold">{title}</Heading>
-            <Text color="gray.500" fontSize="sm" lineHeight="tall">
-              {description}
-            </Text>
+      <Card.Root 
+        variant="outline"
+        borderRadius="xl" 
+        bg="bg.surface"
+        transition="all 0.2s"
+        _hover={{ transform: 'translateY(-2px)', shadow: 'md', borderColor: 'border.brand' }}
+        borderColor="border.default"
+        h="full"
+      >
+        <Card.Body p={6}>
+          <Stack gap={4} align="start">
+            <Box p={2.5} borderRadius="lg" bg="bg.brand.subtle" color="fg.brand">
+              {icon}
+            </Box>
+            <Stack gap={1.5}>
+              <Heading size="md" fontWeight="bold" color="fg.heading">{title}</Heading>
+              <Text color="fg.muted" fontSize="sm" lineHeight="tall">
+                {description}
+              </Text>
+            </Stack>
           </Stack>
-        </Stack>
-      </Card.Body>
-    </Card.Root>
+        </Card.Body>
+      </Card.Root>
+    </MotionBox>
   );
 }
 
-// קומפוננטת שורת סטטוס
+// Status Item
 interface StatusItemProps {
   completed?: boolean;
   inProgress?: boolean;
@@ -180,24 +205,30 @@ interface StatusItemProps {
 
 function StatusItem({ completed, inProgress, text }: StatusItemProps) {
   return (
-    <HStack gap={3} py={1}>
-      <Circle 
-        size="24px" 
-        bg={completed ? 'green.100' : inProgress ? 'orange.100' : 'gray.100'}
+    <HStack gap={2.5} py={1}>
+      <Box
+        w="20px"
+        h="20px"
+        borderRadius="full"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        bg={completed ? 'green.100' : inProgress ? 'brand.100' : 'bg.muted'}
+        flexShrink={0}
       >
         {completed ? (
-          <Check size={14} color="#059669" strokeWidth={3} />
+          <Check size={12} color="#059669" strokeWidth={3} />
         ) : inProgress ? (
-          <Loader size={14} color="#d97706" strokeWidth={3} />
+          <Loader size={12} color="#d97706" strokeWidth={3} />
         ) : (
-          <Box w="6px" h="6px" borderRadius="full" bg="gray.300" />
+          <Box w="5px" h="5px" borderRadius="full" bg="fg.subtle" />
         )}
-      </Circle>
+      </Box>
       <Text 
         fontSize="sm" 
-        fontWeight={inProgress ? "bold" : "medium"} 
-        color={completed ? "gray.400" : "gray.700"}
-        textDecoration={completed ? "line-through" : "none"}
+        fontWeight={inProgress ? 'semibold' : 'normal'} 
+        color={completed ? 'fg.subtle' : 'fg.default'}
+        textDecoration={completed ? 'line-through' : 'none'}
       >
         {text}
       </Text>

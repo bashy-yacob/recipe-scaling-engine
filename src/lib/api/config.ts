@@ -8,6 +8,15 @@
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
+const TOKEN_KEY = 'auth_token';
+
+/**
+ * Get auth token from localStorage
+ */
+export function getAuthToken(): string | null {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -15,7 +24,7 @@ export interface ApiResponse<T> {
 }
 
 /**
- * Fetch wrapper with error handling
+ * Fetch wrapper with error handling and automatic auth header
  */
 export async function apiFetch<T>(
   endpoint: string,
@@ -23,10 +32,13 @@ export async function apiFetch<T>(
 ): Promise<ApiResponse<T>> {
   try {
     const url = `${API_BASE_URL}${endpoint}`;
+    const token = getAuthToken();
+    
     const response = await fetch(url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...options?.headers,
       },
     });

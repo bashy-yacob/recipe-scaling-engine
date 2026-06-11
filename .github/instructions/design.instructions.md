@@ -3,101 +3,95 @@ applyTo: "**/*.{tsx,ts,css}"
 ---
 # Design & UI Instructions
 
-## Tech Stack & Design System
-- **Framework**: React 19 (Next.js 16 App Router)
+> 📚 לפרטים מלאים על עיצוב UI ראה: `.github/skills/first/SKILL.md`
+
+## Tech Stack
+- **Framework**: React 19 + Vite + TypeScript (strict)
 - **UI Library**: Chakra UI v3
-- **Icons**: Lucide React
+- **Icons**: Lucide React בלבד
 - **Animations**: Framer Motion
-- **Fonts**: 'Assistant' (Google Fonts) for Hebrew
-- **Styling Method**: Chakra UI props & system (avoid inline CSS)
+- **Font**: 'Assistant' (Google Fonts) - מותאם לעברית
 
-## Core Design Principles
-1.  **Mobile First**: Ensure all layouts work on mobile devices.
-2.  **RTL (Right-to-Left)**: Native support for Hebrew.
-    - Use logical properties (`marginStart`, `marginEnd`) instead of `marginLeft`/`marginRight`.
-    - Ensure flex containers have correct direction logic.
-3.  **Accessibility (a11y)**:
-    - Use semantic HTML.
-    - Ensure sufficient color contrast.
-    - All interactive elements must be focusable.
-4.  **Warm & Appetizing**: Use warm color tones typical for food apps.
+## עקרונות עיצוב
 
-## Color Palette
-Use Chakra UI's semantic tokens or theme scaling.
-- **Primary**: Warm Orange/Terra Cotta (e.g., `orange.500`, `orange.600`) - for main actions.
-- **Secondary**: Sage Green or Soft Teal - for success/freshness indicators.
-- **Background**: `gray.50` for general page background to reduce eye strain compared to pure white.
-- **Text**: `gray.800` for primary text, `gray.600` for secondary.
-- **Error**: `red.500`
-- **Warning**: `yellow.500`
+### 1. Mobile First
+- כל layout עובד במובייל קודם
+- Responsive עם Chakra: `{{ base: "100%", md: "50%" }}`
 
-## Component Guidelines
+### 2. RTL (עברית)
+- `dir="rtl"` על containers ראשיים
+- Logical properties: `marginStart`/`marginEnd` (לא left/right)
+- פונט Assistant לכל הטקסט
 
-### Layouts
-- Use `<Container>` to center content with `maxW` constraints.
-- Use `<Stack>` (`VStack`, `HStack`) for spacing items evenly instead of manual margins.
-- Use `<Grid>` or `<SimpleGrid>` for responsive recipe cards.
+### 3. Accessibility
+- Semantic HTML (`<main>`, `<article>`, `<nav>`)
+- Color contrast מספיק (WCAG AA)
+- כל אלמנט אינטראקטיבי focusable
 
-### Typography
-- **Heading**: Use for page titles. `fontFamily="Assistant"`.
-- **Text**: Use for body content.
-- **Hebrew Support**: Ensure `dir="rtl"` is set on the root layout or body.
+### 4. עיצוב חם ומזמין
+- זו אפליקציית אוכל - העיצוב צריך לעורר תיאבון
 
-### Buttons
-- **Primary Action**: Solid variant, Primary color.
-- **Secondary Action**: Outline or Ghost variant.
-- **Destructive**: Red color scheme.
+## פלטת צבעים
 
-### Cards (Recipes)
-- Use standard Card components (`Card`, `CardBody`, etc.).
-- consistent spacing (`p={4}` or `p={6}`).
-- Rounded corners (`rounded="md"` or `rounded="lg"`).
-- Subtle shadow (`shadow="sm"`), hover effect (`_hover={{ shadow: 'md' }}`).
+| שימוש | צבע | דוגמה |
+|-------|-----|-------|
+| Primary | Orange | `colorScheme="orange"` |
+| Success | Green | `colorScheme="green"` |
+| Background | Gray.50 | `bg="gray.50"` |
+| Text Primary | Gray.800 | `color="gray.800"` |
+| Text Secondary | Gray.600 | `color="gray.600"` |
+| Error | Red | `colorScheme="red"` |
 
-### Forms
-- Use `FormControl`, `FormLabel`, `FormErrorMessage`, `FormHelperText`.
-- Validate inputs visually (red borders/text for errors).
+## קומפוננטות Chakra
 
-## CSS / Styling Rules
-- **Properties**: Prefer Chakra shorthand props (`m`, `p`, `bg`, `c`) for brevity.
-- **Avoid**: Raw CSS files (except `globals.css` for fonts/reset).
-- **Responsive**: Use array syntax or object syntax for breakpoints.
-  ```tsx
-  <Box w={{ base: "100%", md: "50%" }}>...</Box>
-  ```
-
-## Icons
-- Import from `lucide-react`.
-- Pass Lucide icons to Chakra's `<Icon />` or use them directly if wrapped properly.
-  ```tsx
-  <Icon as={ChefHat} boxSize={6} />
-  ```
-
-## Hebrew Specifics
-- Text Alignment: Default is right for Hebrew.
-- Input fields should have `dir="rtl"`.
-- Placeholders in Hebrew.
-- Date/Currency formatting: Use Hebrew locale (`he-IL`).
-
-## Example pattern
+### כפתורים
 ```tsx
-import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
-import { Plus } from "lucide-react";
-
-export const PageHeader = ({ title, action }: { title: string, action?: () => void }) => {
-  return (
-    <Box as="header" py={6} borderBottomWidth={1} borderColor="gray.100">
-      <VStack align="stretch" spacing={4}>
-        <Heading as="h1" size="xl" color="gray.800">
-          {title}
-        </Heading>
-        {action && (
-          <Button leftIcon={<Plus />} onClick={action} colorScheme="orange">
-            צור מתכון חדש
-          </Button>
-        )}
-      </VStack>
-    </Box>
-  );
-};
+<Button colorScheme="orange">פעולה ראשית</Button>
+<Button variant="outline" colorScheme="orange">פעולה משנית</Button>
+<Button colorScheme="red" variant="ghost">מחק</Button>
 ```
+
+### כרטיסים
+```tsx
+<Card rounded="lg" shadow="sm" _hover={{ shadow: 'md' }}>
+  <CardBody p={4}>...</CardBody>
+</Card>
+```
+
+### טפסים
+```tsx
+<FormControl isInvalid={!!error}>
+  <FormLabel>שם המתכון</FormLabel>
+  <Input dir="rtl" focusBorderColor="orange.500" />
+  <FormErrorMessage>שדה חובה</FormErrorMessage>
+</FormControl>
+```
+
+### רשת מתכונים
+```tsx
+<SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={6}>
+  {recipes.map(r => <RecipeCard key={r.id} {...r} />)}
+</SimpleGrid>
+```
+
+## אייקונים (Lucide React)
+```tsx
+import { ChefHat, Plus, Trash } from "lucide-react";
+
+<Button leftIcon={<Plus size={18} />}>הוסף</Button>
+```
+
+## Toasts
+```tsx
+import { toast } from '@/components/ui/toaster';
+toast.success({ description: 'נשמר בהצלחה' });
+toast.error({ description: 'שגיאה בשמירה' });
+```
+
+## מה להימנע
+
+❌ CSS קבצים נפרדים (חוץ מ-globals.css)
+❌ Inline styles (`style={{}}`)
+❌ פונטים אחרים מלבד Assistant
+❌ `marginLeft`/`marginRight` - השתמש ב-logical properties
+❌ אייקונים שלא מ-Lucide

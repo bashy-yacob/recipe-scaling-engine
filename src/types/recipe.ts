@@ -107,4 +107,4 @@ export interface CreateRecipeDTO {
   }>;
 }
 
-export interface UpdateRecipeDTO extends Partial<CreateRecipeDTO> {}
+export type UpdateRecipeDTO = Partial<CreateRecipeDTO>;

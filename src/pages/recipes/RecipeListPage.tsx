@@ -14,17 +14,29 @@ import {
   SimpleGrid,
   Card,
   Center,
-  Spinner,
   Tabs,
   Select,
   createListCollection,
+  Skeleton,
 } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Search, ChefHat, Heart, Clock, Users, Globe, Lock, Filter } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { toaster } from '@/components/ui/toaster';
 import { getRecipes, toggleRecipeLike, toggleRecipePublic } from '@/lib/api/recipes';
 import { ROUTES, getRecipeDetailsPath } from '@/router';
 import type { RecipeListItem } from '@/types/recipe';
+
+const MotionBox = motion.create(Box);
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.06, duration: 0.35, ease: 'easeOut' as const },
+  }),
+};
 
 // Sort options
 const sortOptions = createListCollection({
@@ -154,40 +166,50 @@ export function RecipeListPage() {
 
   if (loading) {
     return (
-      <Center w="full" h="80vh">
-        <Spinner size="xl" color="orange.500" />
-      </Center>
+      <Box bg="bg.page" minH="100vh" dir="rtl">
+        <Box bg="bg.surface" borderBottom="1px solid" borderColor="border.muted">
+          <Container maxW="5xl" mx="auto" py={8} px={6}>
+            <Skeleton h="36px" w="200px" borderRadius="lg" />
+          </Container>
+        </Box>
+        <Container maxW="5xl" mx="auto" py={6} px={6}>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={5}>
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <Skeleton key={i} h="180px" borderRadius="xl" />
+            ))}
+          </SimpleGrid>
+        </Container>
+      </Box>
     );
   }
 
   return (
-    <Box minH="100vh" bg="gray.50" dir="rtl">
+    <Box minH="100vh" bg="bg.page" dir="rtl">
       {/* Header */}
-      <Box bg="white" borderBottom="1px" borderColor="gray.200" boxShadow="sm">
-        <Container maxW="5xl" mx="auto" py={10} px={6}>
+      <Box bg="bg.surface" borderBottom="1px solid" borderColor="border.muted">
+        <Container maxW="5xl" mx="auto" py={8} px={6}>
           <HStack justify="space-between" align="center" flexWrap="wrap" gap={4}>
-            <Stack gap={1}>
-              <Heading size="2xl" fontWeight="extrabold" color="gray.900">
+            <Stack gap={0.5}>
+              <Heading size="xl" fontWeight="bold" color="fg.heading">
                 המתכונים שלי
               </Heading>
-              <Text color="gray.500" fontSize="lg">
+              <Text color="fg.muted" fontSize="sm">
                 {recipes.length} מתכונים בספרייה
               </Text>
             </Stack>
             
             <Button
               asChild
-              bg="orange.500"
-              color="white"
-              size="lg"
-              borderRadius="xl"
-              px={6}
-              boxShadow="lg"
-              _hover={{ bg: 'orange.600', transform: 'translateY(-2px)' }}
+              bg="btn.primary.bg"
+              color="btn.primary.fg"
+              size="md"
+              borderRadius="lg"
+              px={5}
+              _hover={{ bg: 'btn.primary.hover' }}
             >
               <Link to={ROUTES.RECIPE_NEW}>
-                <Plus size={20} style={{ marginLeft: '8px' }} />
-                מתכון חדש
+                <Plus size={18} />
+                <Text ms={1.5}>מתכון חדש</Text>
               </Link>
             </Button>
           </HStack>
@@ -195,42 +217,47 @@ export function RecipeListPage() {
       </Box>
 
       {/* Search & Filters */}
-      <Container maxW="5xl" mx="auto" py={6} px={6}>
-        <Stack gap={4}>
+      <Container maxW="5xl" mx="auto" py={5} px={6}>
+        <Stack gap={3}>
           {/* Search Bar */}
-          <HStack gap={4}>
+          <HStack gap={3}>
             <Box position="relative" flex={1}>
               <Box position="absolute" right={3} top="50%" transform="translateY(-50%)" zIndex={2}>
-                <Search size={18} color="#a0aec0" />
+                <Search size={16} color="currentColor" />
               </Box>
               <Input
                 placeholder="חיפוש מתכונים..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 pr={10}
-                size="lg"
-                borderRadius="xl"
-                bg="white"
+                size="md"
+                borderRadius="lg"
+                bg="bg.surface"
+                borderColor="border.default"
+                _focus={{ borderColor: 'brand.500' }}
               />
             </Box>
             <Button
               variant="outline"
-              size="lg"
-              borderRadius="xl"
+              size="md"
+              borderRadius="lg"
+              borderColor="border.default"
+              color="fg.default"
+              _hover={{ bg: 'bg.muted' }}
               onClick={() => setShowFilters(!showFilters)}
             >
-              <Filter size={18} style={{ marginLeft: '8px' }} />
-              פילטרים
+              <Filter size={16} />
+              <Text ms={1.5}>פילטרים</Text>
             </Button>
           </HStack>
 
           {/* Filters Panel */}
           {showFilters && (
-            <Card.Root variant="outline" borderRadius="xl">
+            <Card.Root variant="outline" borderRadius="lg" borderColor="border.default" bg="bg.surface">
               <Card.Body p={4}>
                 <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
                   <Box>
-                    <Text fontSize="sm" fontWeight="medium" mb={2}>מיון</Text>
+                    <Text fontSize="sm" fontWeight="medium" mb={2} color="fg.default">מיון</Text>
                     <Select.Root
                       collection={sortOptions}
                       value={[sortBy]}
@@ -247,7 +274,7 @@ export function RecipeListPage() {
                     </Select.Root>
                   </Box>
                   <Box>
-                    <Text fontSize="sm" fontWeight="medium" mb={2}>רמת קושי</Text>
+                    <Text fontSize="sm" fontWeight="medium" mb={2} color="fg.default">רמת קושי</Text>
                     <Select.Root
                       collection={difficultyOptions}
                       value={[difficulty]}
@@ -264,7 +291,7 @@ export function RecipeListPage() {
                     </Select.Root>
                   </Box>
                   <Box>
-                    <Text fontSize="sm" fontWeight="medium" mb={2}>קטגוריה</Text>
+                    <Text fontSize="sm" fontWeight="medium" mb={2} color="fg.default">קטגוריה</Text>
                     <Select.Root
                       collection={categoryOptions}
                       value={[category]}
@@ -298,27 +325,34 @@ export function RecipeListPage() {
       {/* Recipe Grid */}
       <Container maxW="5xl" mx="auto" pb={12} px={6}>
         {filteredRecipes.length === 0 ? (
-          <Center py={20}>
-            <Stack align="center" gap={4}>
-              <ChefHat size={64} color="#cbd5e0" />
-              <Text color="gray.500" fontSize="lg">
+          <Center py={16}>
+            <Stack align="center" gap={3}>
+              <ChefHat size={48} color="currentColor" />
+              <Text color="fg.muted" fontSize="md">
                 {searchQuery ? 'לא נמצאו מתכונים התואמים לחיפוש' : 'אין מתכונים עדיין'}
               </Text>
-              <Button asChild colorPalette="orange">
+              <Button asChild bg="btn.primary.bg" color="btn.primary.fg" borderRadius="lg" _hover={{ bg: 'btn.primary.hover' }}>
                 <Link to={ROUTES.RECIPE_NEW}>הוסף מתכון ראשון</Link>
               </Button>
             </Stack>
           </Center>
         ) : (
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-            {filteredRecipes.map((recipe) => (
-              <RecipeCard
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={5}>
+            {filteredRecipes.map((recipe, index) => (
+              <MotionBox
                 key={recipe.id}
-                recipe={recipe}
-                onTogglePublish={handleTogglePublish}
-                onToggleLike={handleToggleLike}
-                onClick={() => navigate(getRecipeDetailsPath(recipe.id))}
-              />
+                initial="hidden"
+                animate="visible"
+                variants={cardVariants}
+                custom={index}
+              >
+                <RecipeCard
+                  recipe={recipe}
+                  onTogglePublish={handleTogglePublish}
+                  onToggleLike={handleToggleLike}
+                  onClick={() => navigate(getRecipeDetailsPath(recipe.id))}
+                />
+              </MotionBox>
             ))}
           </SimpleGrid>
         )}
@@ -338,53 +372,55 @@ interface RecipeCardProps {
 function RecipeCard({ recipe, onTogglePublish, onToggleLike, onClick }: RecipeCardProps) {
   return (
     <Card.Root
-      variant="elevated"
-      borderRadius="2xl"
+      variant="outline"
+      borderRadius="xl"
+      borderColor="border.default"
+      bg="bg.surface"
       overflow="hidden"
       cursor="pointer"
       transition="all 0.2s"
-      _hover={{ transform: 'translateY(-4px)', boxShadow: 'xl' }}
+      _hover={{ transform: 'translateY(-2px)', shadow: 'md', borderColor: 'border.brand' }}
       onClick={onClick}
     >
-      <Card.Body p={6}>
-        <Stack gap={4}>
+      <Card.Body p={5}>
+        <Stack gap={3}>
           <HStack justify="space-between">
-            <Heading size="md" lineClamp={1}>{recipe.title}</Heading>
+            <Heading size="md" lineClamp={1} color="fg.heading">{recipe.title}</Heading>
             <HStack gap={1}>
               <Button
                 size="xs"
                 variant="ghost"
                 onClick={(e) => onToggleLike(e, recipe.id)}
-                color={recipe.isLiked ? 'red.500' : 'gray.400'}
+                color={recipe.isLiked ? 'red.500' : 'fg.subtle'}
               >
-                <Heart size={16} fill={recipe.isLiked ? 'currentColor' : 'none'} />
+                <Heart size={14} fill={recipe.isLiked ? 'currentColor' : 'none'} />
                 <Text>{recipe.likeCount}</Text>
               </Button>
               <Button
                 size="xs"
                 variant="ghost"
                 onClick={(e) => onTogglePublish(e, recipe.id, recipe.isPublic || false)}
-                color={recipe.isPublic ? 'green.500' : 'gray.400'}
+                color={recipe.isPublic ? 'green.500' : 'fg.subtle'}
               >
-                {recipe.isPublic ? <Globe size={16} /> : <Lock size={16} />}
+                {recipe.isPublic ? <Globe size={14} /> : <Lock size={14} />}
               </Button>
             </HStack>
           </HStack>
 
           {recipe.description && (
-            <Text color="gray.500" fontSize="sm" lineClamp={2}>
+            <Text color="fg.muted" fontSize="sm" lineClamp={2}>
               {recipe.description}
             </Text>
           )}
 
-          <HStack gap={4} fontSize="sm" color="gray.500">
+          <HStack gap={4} fontSize="sm" color="fg.muted">
             <HStack gap={1}>
-              <Users size={14} />
+              <Users size={13} />
               <Text>{recipe.servings} מנות</Text>
             </HStack>
             {recipe.prepTime && (
               <HStack gap={1}>
-                <Clock size={14} />
+                <Clock size={13} />
                 <Text>{recipe.prepTime} דק'</Text>
               </HStack>
             )}
@@ -392,12 +428,12 @@ function RecipeCard({ recipe, onTogglePublish, onToggleLike, onClick }: RecipeCa
 
           <HStack gap={2} flexWrap="wrap">
             {recipe.recipeIngredients.slice(0, 3).map((ing, idx) => (
-              <Badge key={idx} colorPalette="orange" variant="subtle" fontSize="xs">
+              <Badge key={idx} variant="subtle" fontSize="xs" bg="bg.brand.subtle" color="fg.brand" borderRadius="md">
                 {ing.ingredient.name}
               </Badge>
             ))}
             {recipe.recipeIngredients.length > 3 && (
-              <Badge colorPalette="gray" variant="subtle" fontSize="xs">
+              <Badge variant="subtle" fontSize="xs" bg="bg.muted" color="fg.muted" borderRadius="md">
                 +{recipe.recipeIngredients.length - 3}
               </Badge>
             )}

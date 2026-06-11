@@ -9,7 +9,7 @@ import { Footer } from './components/shared/Footer';
  */
 export function App() {
   return (
-    <Box minH="100vh" display="flex" flexDirection="column">
+    <Box minH="100vh" display="flex" flexDirection="column" bg="bg.page">
       <Navbar />
       <Box as="main" flex="1">
         <Outlet />

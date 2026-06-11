@@ -24,51 +24,46 @@ export function ErrorPage() {
   }
 
   return (
-    <Box minH="100vh" bg="gray.50" dir="rtl">
+    <Box minH="100vh" bg="bg.page" dir="rtl">
       <Center h="100vh">
-        <VStack gap={6} textAlign="center" p={8}>
-          <Box
-            bg="red.100"
-            p={6}
-            borderRadius="3xl"
-          >
-            <AlertTriangle size={64} color="#dc2626" />
+        <VStack gap={5} textAlign="center" p={8}>
+          <Box bg="red.100" _dark={{ bg: 'red.900/30' }} p={5} borderRadius="xl">
+            <AlertTriangle size={48} color="#dc2626" />
           </Box>
           
-          <VStack gap={2}>
-            <Heading size="2xl" color="gray.800" fontWeight="extrabold">
+          <VStack gap={1.5}>
+            <Heading size="xl" color="fg.heading" fontWeight="bold">
               {errorTitle}
             </Heading>
-            <Text color="gray.500" fontSize="lg" maxW="md">
+            <Text color="fg.muted" fontSize="md" maxW="sm">
               {errorMessage}
             </Text>
           </VStack>
 
-          <VStack gap={3}>
+          <VStack gap={2}>
             <Button
               onClick={() => window.location.reload()}
-              bg="orange.500"
-              color="white"
-              size="lg"
-              borderRadius="xl"
-              px={8}
-              _hover={{ bg: 'orange.600' }}
+              bg="btn.primary.bg"
+              color="btn.primary.fg"
+              _hover={{ bg: 'btn.primary.hover' }}
+              borderRadius="lg"
+              px={6}
             >
-              <RefreshCw size={20} style={{ marginLeft: '8px' }} />
-              נסה שוב
+              <RefreshCw size={18} />
+              <Text ms={1}>נסה שוב</Text>
             </Button>
 
             <Button
               asChild
               variant="outline"
-              colorPalette="gray"
-              size="lg"
-              borderRadius="xl"
-              px={8}
+              borderColor="border.default"
+              color="fg.default"
+              borderRadius="lg"
+              px={6}
             >
               <Link to={ROUTES.HOME}>
-                <Home size={20} style={{ marginLeft: '8px' }} />
-                חזרה לדף הבית
+                <Home size={18} />
+                <Text ms={1}>חזרה לדף הבית</Text>
               </Link>
             </Button>
           </VStack>

@@ -13,9 +13,10 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# Vite
+/dist
+/dist-ssr
+*.local
 
 # production
 /build
@@ -23,12 +24,15 @@
 # misc
 .DS_Store
 *.pem
+.vscode/
+.idea/
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+lerna-debug.log*
 
 # env files (keep .env.example for reference)
 .env
@@ -38,6 +42,8 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 .env.production
+.env.prod
+temp-db-url.txt
 
 # But commit .env.example!
 !.env.example
@@ -47,7 +53,23 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+vite-env.d.ts
+
+# Prisma
+prisma/dev.db
+prisma/dev.db-journal
+prisma/*.db
+prisma/*.db-journal
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 /lib/generated/prisma
 

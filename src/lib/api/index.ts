@@ -3,3 +3,4 @@
 export * from './config';
 export * from './recipes';
 export * from './upload';
+export * from './auth';

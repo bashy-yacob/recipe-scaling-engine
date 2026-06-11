@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import {
   Box, Container, Heading, Text, Button, Input, Textarea, Card,
-  HStack, Stack, Badge, IconButton, SimpleGrid, Center, Spinner,
+  HStack, Stack, Badge, IconButton, SimpleGrid, Skeleton,
 } from '@chakra-ui/react';
 import { toaster } from '@/components/ui/toaster';
 import { ImageUploader } from '@/components/shared/ImageUploader';
@@ -205,35 +205,49 @@ export function RecipeEditPage() {
 
   if (loading) {
     return (
-      <Center w="full" h="100vh">
-        <Spinner size="xl" color="orange.500" />
-      </Center>
+      <Box bg="bg.page" minH="100vh" dir="rtl">
+        <Box bg="bg.surface" borderBottom="1px solid" borderColor="border.muted">
+          <Container maxW="4xl" mx="auto" py={5} px={4}>
+            <Skeleton h="32px" w="250px" borderRadius="lg" />
+          </Container>
+        </Box>
+        <Container maxW="4xl" mx="auto" py={8} px={4}>
+          <Stack gap={6}>
+            <Skeleton h="200px" borderRadius="xl" />
+            <Skeleton h="200px" borderRadius="xl" />
+          </Stack>
+        </Container>
+      </Box>
     );
   }
 
   return (
-    <Box minH="100vh" bg="gray.50" dir="rtl">
+    <Box minH="100vh" bg="bg.page" dir="rtl">
       {/* Header */}
-      <Box bg="white" borderBottom="1px" borderColor="gray.200" boxShadow="sm">
-        <Container maxW="4xl" mx="auto" py={6} px={4}>
+      <Box bg="bg.surface" borderBottom="1px solid" borderColor="border.muted">
+        <Container maxW="4xl" mx="auto" py={5} px={4}>
           <HStack justify="space-between" align="center">
-            <HStack gap={4}>
-              <Button asChild variant="ghost" size="sm">
+            <HStack gap={3}>
+              <Button asChild variant="ghost" size="sm" color="fg.muted" _hover={{ color: 'fg.default' }}>
                 <Link to={getRecipeDetailsPath(recipeId)}>
-                  <ArrowRight size={20} style={{ marginLeft: '8px' }} /> חזרה
+                  <ArrowRight size={18} />
+                  <Text ms={1}>חזרה</Text>
                 </Link>
               </Button>
-              <Heading size="xl" fontWeight="bold">עריכת מתכון</Heading>
+              <Heading size="lg" fontWeight="bold" color="fg.heading">עריכת מתכון</Heading>
             </HStack>
             <Button
-              bg="orange.500"
-              color="white"
+              bg="btn.primary.bg"
+              color="btn.primary.fg"
+              _hover={{ bg: 'btn.primary.hover' }}
+              borderRadius="lg"
+              size="sm"
               onClick={handleSave}
               loading={saving}
               loadingText="שומר..."
             >
-              <Save size={18} style={{ marginLeft: '8px' }} />
-              שמירה
+              <Save size={16} />
+              <Text ms={1}>שמירה</Text>
             </Button>
           </HStack>
         </Container>
@@ -242,57 +256,66 @@ export function RecipeEditPage() {
       <Container maxW="4xl" mx="auto" py={8} px={4}>
         <Stack gap={6}>
           {/* Basic Info */}
-          <Card.Root variant="elevated" borderRadius="2xl">
-            <Card.Body p={8}>
-              <Stack gap={6}>
-                <Heading size="md">פרטי המתכון</Heading>
+          <Card.Root variant="outline" borderColor="border.default" bg="bg.surface" borderRadius="xl">
+            <Card.Body p={6}>
+              <Stack gap={5}>
+                <Heading size="sm" color="fg.heading">פרטי המתכון</Heading>
                 
                 <Box>
-                  <Text mb={2} fontWeight="medium">שם המתכון *</Text>
+                  <Text mb={1.5} fontWeight="medium" fontSize="sm" color="fg.default">שם המתכון *</Text>
                   <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="לדוגמה: עוגת שוקולד בלגית"
-                    size="lg"
+                    borderRadius="lg"
+                    borderColor="border.default"
                   />
                 </Box>
 
                 <Box>
-                  <Text mb={2} fontWeight="medium">תיאור</Text>
+                  <Text mb={1.5} fontWeight="medium" fontSize="sm" color="fg.default">תיאור</Text>
                   <Textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="תיאור קצר של המתכון..."
                     rows={3}
+                    borderRadius="lg"
+                    borderColor="border.default"
                   />
                 </Box>
 
                 <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
                   <Box>
-                    <Text mb={2} fontWeight="medium">מנות</Text>
+                    <Text mb={1.5} fontWeight="medium" fontSize="sm" color="fg.default">מנות</Text>
                     <Input
                       type="number"
                       value={servings}
                       onChange={(e) => setServings(e.target.value)}
                       min={1}
+                      borderRadius="lg"
+                      borderColor="border.default"
                     />
                   </Box>
                   <Box>
-                    <Text mb={2} fontWeight="medium">זמן הכנה (דקות)</Text>
+                    <Text mb={1.5} fontWeight="medium" fontSize="sm" color="fg.default">זמן הכנה (דקות)</Text>
                     <Input
                       type="number"
                       value={prepTime}
                       onChange={(e) => setPrepTime(e.target.value)}
                       placeholder="30"
+                      borderRadius="lg"
+                      borderColor="border.default"
                     />
                   </Box>
                   <Box>
-                    <Text mb={2} fontWeight="medium">זמן בישול (דקות)</Text>
+                    <Text mb={1.5} fontWeight="medium" fontSize="sm" color="fg.default">זמן בישול (דקות)</Text>
                     <Input
                       type="number"
                       value={cookTime}
                       onChange={(e) => setCookTime(e.target.value)}
                       placeholder="45"
+                      borderRadius="lg"
+                      borderColor="border.default"
                     />
                   </Box>
                 </SimpleGrid>
@@ -301,14 +324,14 @@ export function RecipeEditPage() {
           </Card.Root>
 
           {/* Ingredients */}
-          <Card.Root variant="elevated" borderRadius="2xl">
-            <Card.Body p={8}>
+          <Card.Root variant="outline" borderColor="border.default" bg="bg.surface" borderRadius="xl">
+            <Card.Body p={6}>
               <Stack gap={4}>
                 <HStack justify="space-between">
-                  <Heading size="md">מרכיבים</Heading>
-                  <Button size="sm" variant="outline" onClick={addIngredient}>
-                    <Plus size={16} style={{ marginLeft: '4px' }} />
-                    הוסף מרכיב
+                  <Heading size="sm" color="fg.heading">מרכיבים</Heading>
+                  <Button size="sm" variant="outline" borderRadius="lg" borderColor="border.default" color="fg.default" onClick={addIngredient}>
+                    <Plus size={14} />
+                    <Text ms={1}>הוסף מרכיב</Text>
                   </Button>
                 </HStack>
 
@@ -361,21 +384,21 @@ export function RecipeEditPage() {
           </Card.Root>
 
           {/* Instructions */}
-          <Card.Root variant="elevated" borderRadius="2xl">
-            <Card.Body p={8}>
+          <Card.Root variant="outline" borderColor="border.default" bg="bg.surface" borderRadius="xl">
+            <Card.Body p={6}>
               <Stack gap={4}>
                 <HStack justify="space-between">
-                  <Heading size="md">הוראות הכנה</Heading>
-                  <Button size="sm" variant="outline" onClick={addInstruction}>
-                    <Plus size={16} style={{ marginLeft: '4px' }} />
-                    הוסף שלב
+                  <Heading size="sm" color="fg.heading">הוראות הכנה</Heading>
+                  <Button size="sm" variant="outline" borderRadius="lg" borderColor="border.default" color="fg.default" onClick={addInstruction}>
+                    <Plus size={14} />
+                    <Text ms={1}>הוסף שלב</Text>
                   </Button>
                 </HStack>
 
                 {instructions.map((inst, idx) => (
                   <HStack key={inst.id} gap={2} align="start">
                     <Badge
-                      bg="orange.500"
+                      bg="brand.500"
                       color="white"
                       borderRadius="full"
                       w="28px"
@@ -384,6 +407,7 @@ export function RecipeEditPage() {
                       alignItems="center"
                       justifyContent="center"
                       mt={2}
+                      fontSize="xs"
                     >
                       {idx + 1}
                     </Badge>
@@ -415,14 +439,14 @@ export function RecipeEditPage() {
           </Card.Root>
 
           {/* Images */}
-          <Card.Root variant="elevated" borderRadius="2xl">
-            <Card.Body p={8}>
+          <Card.Root variant="outline" borderColor="border.default" bg="bg.surface" borderRadius="xl">
+            <Card.Body p={6}>
               <Stack gap={4}>
                 <HStack justify="space-between">
-                  <Heading size="md">תמונות</Heading>
-                  <Button size="sm" variant="outline" onClick={addImage}>
-                    <Plus size={16} style={{ marginLeft: '4px' }} />
-                    הוסף תמונה
+                  <Heading size="sm" color="fg.heading">תמונות</Heading>
+                  <Button size="sm" variant="outline" borderRadius="lg" borderColor="border.default" color="fg.default" onClick={addImage}>
+                    <Plus size={14} />
+                    <Text ms={1}>הוסף תמונה</Text>
                   </Button>
                 </HStack>
 

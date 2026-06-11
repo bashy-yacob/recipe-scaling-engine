@@ -73,7 +73,7 @@ export function ImageUploader({ value, onChange, onRemove, placeholder }: ImageU
   // If we have a value, show preview
   if (value) {
     return (
-      <Box position="relative" borderRadius="lg" overflow="hidden" bg="gray.100">
+      <Box position="relative" borderRadius="lg" overflow="hidden" bg="bg.muted">
         <img
           src={value}
           alt="תמונה שהועלתה"
@@ -114,7 +114,7 @@ export function ImageUploader({ value, onChange, onRemove, placeholder }: ImageU
             onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
             size="sm"
           />
-          <Button size="sm" colorPalette="orange" onClick={handleUrlSubmit}>
+          <Button size="sm" bg="btn.primary.bg" color="btn.primary.fg" _hover={{ bg: 'btn.primary.hover' }} borderRadius="lg" onClick={handleUrlSubmit}>
             אישור
           </Button>
           <IconButton
@@ -134,13 +134,13 @@ export function ImageUploader({ value, onChange, onRemove, placeholder }: ImageU
   return (
     <Box
       border="2px dashed"
-      borderColor={isUploading ? 'orange.300' : 'gray.200'}
+      borderColor={isUploading ? 'brand.300' : 'border.default'}
       borderRadius="lg"
       p={6}
       textAlign="center"
-      bg={isUploading ? 'orange.50' : 'gray.50'}
+      bg={isUploading ? 'bg.brand.subtle' : 'bg.subtle'}
       cursor={isUploading ? 'wait' : 'pointer'}
-      _hover={{ bg: 'orange.50', borderColor: 'orange.300' }}
+      _hover={{ bg: 'bg.brand.subtle', borderColor: 'brand.300' }}
       transition="all 0.2s"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -156,33 +156,33 @@ export function ImageUploader({ value, onChange, onRemove, placeholder }: ImageU
       
       {isUploading ? (
         <Stack gap={2} align="center">
-          <Spinner size="lg" color="orange.500" />
-          <Text color="orange.600" fontWeight="medium">מעלה תמונה...</Text>
+          <Spinner size="lg" color="brand.500" />
+          <Text color="fg.brand" fontWeight="medium">מעלה תמונה...</Text>
         </Stack>
       ) : (
         <Stack gap={3} align="center">
-          <Box p={3} bg="white" rounded="full" shadow="sm">
-            <Upload size={24} color="#DD6B20" />
+          <Box p={3} bg="bg.surface" rounded="full">
+            <Upload size={22} color="var(--chakra-colors-brand-500)" />
           </Box>
           <Stack gap={1}>
-            <Text fontWeight="medium" color="gray.700">
+            <Text fontWeight="medium" color="fg.default" fontSize="sm">
               {placeholder || 'לחץ להעלאת תמונה או גרור לכאן'}
             </Text>
-            <Text fontSize="xs" color="gray.500">
+            <Text fontSize="xs" color="fg.muted">
               JPG, PNG, WebP או GIF עד 5MB
             </Text>
           </Stack>
           <Button
             size="xs"
             variant="ghost"
-            colorPalette="gray"
+            color="fg.muted"
             onClick={(e) => {
               e.stopPropagation();
               setShowUrlInput(true);
             }}
           >
-            <LinkIcon size={14} style={{ marginLeft: '4px' }} />
-            או הדבק URL
+            <LinkIcon size={14} />
+            <Text ms={1}>או הדבק URL</Text>
           </Button>
         </Stack>
       )}
